@@ -10,6 +10,7 @@ import SDWebImage
 
 protocol ProfileHeaderDelegate: class {
     func header(_ profileHeader: ProfileHeader, didTapActionButtonFor user: User)
+    func header(wantsToShowUserFollowers show: Bool)
 }
 
 class ProfileHeader: UICollectionReusableView {
@@ -42,6 +43,15 @@ class ProfileHeader: UICollectionReusableView {
         return view
     }()
     
+    private let bioLabel: UILabel = {
+        let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 12)
+        view.text = "bio"
+        view.numberOfLines = 0
+        
+        return view
+    }()
+    
     private lazy var editProfileFollowButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Loading", for: .normal)
@@ -68,6 +78,10 @@ class ProfileHeader: UICollectionReusableView {
         view.numberOfLines = 0
         view.textAlignment = .center
         
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleShowFollowers))
+        view.isUserInteractionEnabled = true
+        view.addGestureRecognizer(tap)
+        
         return view
     }()
     
@@ -76,33 +90,16 @@ class ProfileHeader: UICollectionReusableView {
         view.numberOfLines = 0
         view.textAlignment = .center
         
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleShowFollowings))
+        view.isUserInteractionEnabled = true
+        view.addGestureRecognizer(tap)
+        
         return view
     }()
-    
-    let gridButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(#imageLiteral(resourceName: "grid"), for: .normal)
-        
-        return button
-    }()
-    
-    let listButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(#imageLiteral(resourceName: "list"), for: .normal)
-        button.tintColor = UIColor(white: 0, alpha: 0.2)
-        
-        return button
-    }()
-    
-    let bookmarkButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(#imageLiteral(resourceName: "ribbon"), for: .normal)
-        button.tintColor = UIColor(white: 0, alpha: 0.2)
-        
-        return button
-    }()
+
     
     //MARK: - Lifecycle
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -116,12 +113,23 @@ class ProfileHeader: UICollectionReusableView {
         nameLabel.anchor(top: profileImageView.bottomAnchor, left: leftAnchor,
                          paddingTop: 12, paddingLeft: 12)
         
+        addSubview(bioLabel)
+        bioLabel.anchor(top: nameLabel.bottomAnchor, left: leftAnchor, right: rightAnchor,
+                        paddingTop: 6, paddingLeft: 12, paddingRight: 12)
+        
         addSubview(editProfileFollowButton)
-        editProfileFollowButton.anchor(top: nameLabel.bottomAnchor, left: leftAnchor, right: rightAnchor,
+        editProfileFollowButton.anchor(top: bioLabel.bottomAnchor, left: leftAnchor, right: rightAnchor,
                                  paddingTop: 16, paddingLeft: 24, paddingRight: 24)
         
-        configureStackForLabels()
-        configureStackForButtons()
+        let divider = UIView()
+        divider.backgroundColor = .lightGray
+        
+        addSubview(divider)
+        divider.anchor(top: editProfileFollowButton.bottomAnchor, left: leftAnchor,right: rightAnchor,
+                       paddingTop: 30, height: 0.5)
+        
+        
+        configureStack()
     }
     
     required init?(coder: NSCoder) {
@@ -132,7 +140,7 @@ class ProfileHeader: UICollectionReusableView {
     //MARK: - Helper Methods
 
     
-    func configureStackForLabels() {
+    func configureStack() {
         let stack = UIStackView(arrangedSubviews: [postLabel, followersLabel, followingLabel])
         stack.distribution = .fillEqually
         
@@ -142,30 +150,7 @@ class ProfileHeader: UICollectionReusableView {
                      paddingLeft: 12, paddingRight: 12,
                      height: 50)
     }
-    
-    func configureStackForButtons() {
-        let topDivider = UIView()
-        topDivider.backgroundColor = .lightGray
-        
-        let bottomDivider = UIView()
-        bottomDivider.backgroundColor = .lightGray
-        
-        let stack = UIStackView(arrangedSubviews: [gridButton, listButton, bookmarkButton])
-        stack.distribution = .fillEqually
-        
-        addSubview(stack)
-        stack.anchor(left: leftAnchor, bottom: bottomAnchor,
-                     right: rightAnchor, height: 50)
-        
-        addSubview(topDivider)
-        topDivider.anchor(top: stack.topAnchor, left: leftAnchor,
-                          right: rightAnchor, height: 0.5)
-        
-        addSubview(bottomDivider)
-        bottomDivider.anchor(top: stack.bottomAnchor, left: leftAnchor,
-                             right: rightAnchor, height: 0.5)
-    }
-    
+
     func populate() {
         guard let viewModel = self.viewModel else { return }
         
@@ -186,5 +171,13 @@ class ProfileHeader: UICollectionReusableView {
     @objc func handleEditProfile() {
         guard let viewModel = self.viewModel else {return}
         delegate?.header(self, didTapActionButtonFor: viewModel.user)
+    }
+    
+    @objc func handleShowFollowers() {
+        delegate?.header(wantsToShowUserFollowers: true)
+    }
+    
+    @objc func handleShowFollowings() {
+        delegate?.header(wantsToShowUserFollowers: false)
     }
 }

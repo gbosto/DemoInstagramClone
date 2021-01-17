@@ -34,7 +34,7 @@ class UploadPostController: UIViewController {
     private lazy var captionTextView: InputTextView = {
         let view = InputTextView()
         view.contentMode = .scaleToFill
-        view.placeholderText = "Enter caption.."
+        view.placeholderText = "Write a caption.."
         view.font = UIFont.systemFont(ofSize: 16)
         view.delegate = self
         
@@ -95,10 +95,10 @@ class UploadPostController: UIViewController {
     }
     
     func configureNavigationItem() {
-        navigationItem.title = NavigationItemTitle.forUploadPost
-        
-        let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self,
-                                           action: #selector(didTapCancel))
+        navigationItem.title = "New Post"
+
+        let image = UIImage(systemName: "chevron.left")
+        let cancelButton = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(didTapCancel))
         let shareButton = UIBarButtonItem(title: "Share", style: .done,
                                           target: self, action: #selector(didTapDone))
         

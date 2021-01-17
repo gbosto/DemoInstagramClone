@@ -7,11 +7,11 @@
 
 import UIKit
 
-class SearchCell: UITableViewCell {
+class UserCell: UITableViewCell {
     
     //MARK: - Properties
     
-    var viewModel: SearchCellViewModel? {
+    var viewModel: UserCellViewModel? {
         didSet {
             populate()
         }

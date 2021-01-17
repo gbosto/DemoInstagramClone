@@ -7,14 +7,9 @@
 
 import Firebase
 
-struct ReuseId {
-    static let forFeedCell = "FeedCell"
-    static let forProfileCell = "ProfileCell"
-    static let forProfileHeader = "ProfileHeader"
-    static let forSearchTableViewCell = "SearchCellTV"
-    static let forSearchCollectionViewCell = "SearchCellCV"
-    static let forCommentCell = "CommentsCell"
-    static let forNotificationsCell = "NotificationsCell"
+struct FireStoreDirectory {
+    static let posts = "/posts/"
+    static let profileImages = "/profile_images/"
 }
 
 struct NavigationItemTitle {
@@ -28,4 +23,5 @@ struct API {
     static let collectionFollowing = Firestore.firestore().collection("following")
     static let collectionPosts = Firestore.firestore().collection("posts")
     static let collectionNotifications = Firestore.firestore().collection("notifications")
+    static let collectionMessages = Firestore.firestore().collection("messages")
 }

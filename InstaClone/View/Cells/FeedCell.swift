@@ -7,10 +7,12 @@
 
 import UIKit
 
+
 protocol FeedCellDelegate: class {
     func cell(_ cell: FeedCell, wantsToShowCommentsFor post: Post )
     func cell(_ cell: FeedCell, didLike post: Post)
     func cell(_ cell: FeedCell, wantsToShowProfileFor uid: String)
+    func cellWantsToShowPostDetails(post: Post)
 }
 
 
@@ -103,7 +105,7 @@ protocol FeedCellDelegate: class {
         return view
     }()
     
-    private let postTimeLabel: UILabel = {
+    private let timestampLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 12)
         view.textColor = .lightGray
@@ -111,6 +113,17 @@ protocol FeedCellDelegate: class {
         return view
     }()
         
+    
+    private lazy var detailsButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.tintColor = .black
+        let image = UIImage(systemName: "ellipsis")
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(handleDetailsButtonTapped), for: .touchUpInside)
+        button.setDimensions(height: 10, width: 30)
+        
+        return button
+    }()
     
     //MARK: - Lifecycle
     
@@ -125,6 +138,10 @@ protocol FeedCellDelegate: class {
         addSubview(usernameButton)
         usernameButton.centerY(inView: ProfileImageView, leftAnchor: ProfileImageView.rightAnchor,
                                paddingLeft: 8)
+        
+        addSubview(detailsButton)
+        detailsButton.centerY(inView: ProfileImageView)
+        detailsButton.anchor(right: rightAnchor, paddingRight: 12)
         
         addSubview(postImageView)
         postImageView.anchor(top: ProfileImageView.bottomAnchor, left: leftAnchor, right: rightAnchor,
@@ -141,8 +158,8 @@ protocol FeedCellDelegate: class {
         captionLabel.anchor(top: likesLabel.bottomAnchor, left: leftAnchor,
                             paddingTop: 8, paddingLeft: 8)
         
-        addSubview(postTimeLabel)
-        postTimeLabel.anchor(top: captionLabel.bottomAnchor, left: leftAnchor,
+        addSubview(timestampLabel)
+        timestampLabel.anchor(top: captionLabel.bottomAnchor, left: leftAnchor,
                              paddingTop: 8, paddingLeft: 8)
         
     }
@@ -164,6 +181,7 @@ protocol FeedCellDelegate: class {
     
     func configure() {
         guard let viewModel = self.viewModel else {return}
+        
         captionLabel.text = viewModel.caption
         postImageView.sd_setImage(with: viewModel.imageUrl)
         likesLabel.text = viewModel.likes
@@ -175,9 +193,9 @@ protocol FeedCellDelegate: class {
         usernameButton.setTitle(viewModel.username, for: .normal)
         
         guard let timestampText = viewModel.timestampString else {return}
-        postTimeLabel.text = timestampText + " ago"
+        timestampLabel.text = timestampText + " ago"
         
-        
+        detailsButton.isHidden = !viewModel.detailsButtonIsHidden
     }
     
     //MARK: - Selectors
@@ -196,6 +214,11 @@ protocol FeedCellDelegate: class {
         guard let delegate = self.delegate,
               let viewModel = self.viewModel else {return}
         delegate.cell(self, wantsToShowCommentsFor: viewModel.post)
+    }
+        
+    @objc func handleDetailsButtonTapped() {
+        guard let viewModel = viewModel else {return}
+        delegate?.cellWantsToShowPostDetails(post: viewModel.post)
     }
     
 }

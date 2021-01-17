@@ -11,6 +11,7 @@ import YPImagePicker
 class MainTabController: UITabBarController {
     
     //MARK: - Lifecycle
+    
     var user: User? {
         didSet {
             guard let user = self.user else {return}
@@ -22,6 +23,10 @@ class MainTabController: UITabBarController {
         super.viewDidLoad()
         configureUI()
         checkIfUserIsLoggedIn()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         fetchUser()
     }
     //MARK: - API
@@ -38,14 +43,12 @@ class MainTabController: UITabBarController {
             presentLoginController()
             }
         }
-    
-    
-    
-    
+   
     //MARK: - Helper Methods
     
     func presentLoginController() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {return}
             let controller = LoginController()
             controller.delegate = self
             let navigationController = UINavigationController(rootViewController: controller)
@@ -137,6 +140,7 @@ extension MainTabController: UITabBarControllerDelegate {
             configuration.hidesStatusBar = false
             configuration.hidesBottomBar = false
             configuration.library.maxNumberOfItems = 1
+            
             
             let picker = YPImagePicker(configuration: configuration)
             picker.modalPresentationStyle = .fullScreen

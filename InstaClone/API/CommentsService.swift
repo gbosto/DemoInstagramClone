@@ -11,14 +11,16 @@ struct CommentService {
     static func uploadComments(comment: String, postID: String, user: User,
                                completion: @escaping(FirestoreCompletion)) {
         
+        let docRef = API.collectionPosts.document(postID).collection("comments").document()
+        
         let data: [String:Any] = ["uid" : user.uid,
                                    "comment" : comment,
                                    "timestamp" : Timestamp(date: Date()),
                                    "username" : user.username,
-                                   "profileImageUrl" : user.profileImageUrl]
+                                   "profileImageUrl" : user.profileImageUrl,
+                                   "commentId" : docRef.documentID]
         
-        API.collectionPosts.document(postID).collection("comments").addDocument(data: data, completion: completion)
-        
+        docRef.setData(data, completion: completion)
     }
     
     static func fetchComments (forPost postID: String, completion: @escaping([Comment]) -> Void) {
@@ -35,5 +37,19 @@ struct CommentService {
             })
             completion(comments)
         }
+    }
+    
+    static func checkIfCommentBelongsToCurrentUser(post: Post, comment: Comment, completion: @escaping(Bool) -> Void) {
+        guard let currentUserUid = Auth.auth().currentUser?.uid else {return}
+        var belongsTo = false
+    
+        if comment.uid == currentUserUid {
+            belongsTo = true
+        }
+        completion(belongsTo)
+    }
+    
+    static func deleteComment(forPost post: Post, comment: Comment) {
+        API.collectionPosts.document(post.postId).collection("comments").document(comment.commentId).delete()
     }
 }

@@ -8,22 +8,23 @@
 
 import UIKit
 
-protocol CommentInputAccessoryViewDelegate: class {
-    func inputView(_ inputView: CommentInputAccessoryView, wantsToUploadComment comment: String)
+protocol CostumInputAccessoryViewDelegate: class {
+    func inputView(_ inputView: CostumInputAccessoryView, wantsToUploadInput input: String)
 }
 
-class CommentInputAccessoryView: UIView {
+class CostumInputAccessoryView: UIView {
     
     //MARK: - Properties
     
-    weak var delegate: CommentInputAccessoryViewDelegate?
+    weak var delegate: CostumInputAccessoryViewDelegate?
     
      lazy var commentTextView: UITextView = {
         let view = UITextView()
         view.font = UIFont.systemFont(ofSize: 15)
         view.isScrollEnabled = false
         
-        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: UITextView.textDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange),
+                                               name: UITextView.textDidChangeNotification, object: nil)
         
         return view
     }()
@@ -50,8 +51,11 @@ class CommentInputAccessoryView: UIView {
     
     //MARK: - Lifecycle
     
-    override init(frame: CGRect) {
+    init(placeholderTitle: String, buttonTitle: String, frame: CGRect ) {
         super.init(frame: frame)
+        
+        placeholderLabel.text = placeholderTitle
+        postButton.setTitle(buttonTitle, for: .normal)
         
         backgroundColor = .white
         autoresizingMask = .flexibleHeight
@@ -71,7 +75,11 @@ class CommentInputAccessoryView: UIView {
                                 paddingLeft: 4)
         placeholderLabel.centerY(inView: commentTextView)
         
-        configureDivider()
+        let divider = UIView()
+        divider.backgroundColor = .lightGray
+        
+        addSubview(divider)
+        divider.anchor(top: topAnchor, left: leftAnchor, right: rightAnchor, height: 0.5)
     }
     
     required init?(coder: NSCoder) {
@@ -85,16 +93,17 @@ class CommentInputAccessoryView: UIView {
     //MARK: - Selectors
     
     @objc func handlePostTap () {
-        delegate?.inputView(self, wantsToUploadComment: commentTextView.text)
+        delegate?.inputView(self, wantsToUploadInput: commentTextView.text)
     }
     
     @objc func textDidChange() {
         placeholderLabel.isHidden = !commentTextView.text.isEmpty
         postButton.isHidden = commentTextView.text.isEmpty
+        postButton.isEnabled = !commentTextView.text.isEmpty
     }
     //MARK: - Helpers
     
-    func clearCommentTextView() {
+    func clearInputTextView() {
         commentTextView.text = nil
         placeholderLabel.isHidden = false
     }

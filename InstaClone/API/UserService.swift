@@ -12,6 +12,13 @@ typealias FirestoreCompletion = (Error?) -> Void
 
 struct UserService {
     
+    static func fetchCurrentUser(completion: @escaping(User) -> Void) {
+        guard let currentUserUid = Auth.auth().currentUser?.uid else {return}
+        fetchUser(withUid: currentUserUid) { user in
+            completion(user)
+        }
+    }
+    
     static func fetchUser(withUid uid: String, completion: @escaping(User) -> Void) {
 
         API.collectionUsers.document(uid).getDocument { snapshot, error in
@@ -69,5 +76,73 @@ struct UserService {
                 }
             }
         }
+    }
+    
+    static func fetchFollowers(forUid uid: String, completion: @escaping([User]) -> Void) {
+        var users = [User]()
+        
+        API.collectionFollowers.document(uid).collection("user-followers").getDocuments { (snapshot, error) in
+            guard let documents = snapshot?.documents else {return}
+            documents.forEach { document in
+                UserService.fetchUser(withUid: document.documentID) { user in
+                    users.append(user)
+                    completion(users)
+                }
+            }
+        }
+    }
+    
+    static func fetchFollowing(forUid uid: String, completion: @escaping([User]) -> Void) {
+        var users = [User]()
+        
+        API.collectionFollowing.document(uid).collection("user-following").getDocuments { (snapshot, error) in
+            guard let documents = snapshot?.documents else {return}
+            documents.forEach { document in
+                UserService.fetchUser(withUid: document.documentID) { user in
+                    users.append(user)
+                    completion(users)
+                }
+            }
+        }
+    }
+    
+    
+    static func changeUser(user: User, name: String, completion: @escaping(FirestoreCompletion)) {
+        guard let currentUserUid = Auth.auth().currentUser?.uid else {return}
+        
+        let data: [String : Any] = [ "email" : user.email,
+                                     "fullname" : name,
+                                     "profileImageUrl": user.profileImageUrl,
+                                     "uid" : user.uid,
+                                     "username" : user.username,
+                                     "profileImageUid" : user.profileImageUid]
+        
+        API.collectionUsers.document(currentUserUid).setData(data, completion: completion)
+    }
+    
+    static func changeUser(user: User, username: String, completion: @escaping(FirestoreCompletion)) {
+        guard let currentUserUid = Auth.auth().currentUser?.uid else {return}
+        
+        let data: [String : Any] = [ "email" : user.email,
+                                     "fullname" : user.fullname,
+                                     "profileImageUrl": user.profileImageUrl,
+                                     "uid" : user.uid,
+                                     "username" : username,
+                                     "profileImageUid" : user.profileImageUid]
+        
+        API.collectionUsers.document(currentUserUid).setData(data, completion: completion)
+    }
+    
+    static func changeUsersProfileImageUrl(user: User, url: String, completion: @escaping(FirestoreCompletion)) {
+        guard let currentUserUid = Auth.auth().currentUser?.uid else {return}
+        
+        let data: [String : Any] = [ "email" : user.email,
+                                     "fullname" : user.fullname,
+                                     "profileImageUrl": url,
+                                     "uid" : user.uid,
+                                     "username" : user.username,
+                                     "profileImageUid" : user.profileImageUid]
+        
+        API.collectionUsers.document(currentUserUid).setData(data, completion: completion)
     }
 }

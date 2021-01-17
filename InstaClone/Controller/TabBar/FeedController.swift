@@ -5,13 +5,15 @@
 //  Created by Giorgi on 1/4/21.
 //
 
-import UIKit
+import Firebase
 
  class FeedController: UICollectionViewController {
     
     //MARK: - Properties
     
-    private let cellId = ReuseId.forFeedCell
+    private let cellId = "FeedCell"
+    private var headerId = "FeedHeaderId"
+    
     private var posts = [Post]() {
         didSet {
             collectionView.reloadData()
@@ -33,36 +35,68 @@ import UIKit
         
         if post != nil {
             checkIfUserLikedPost()
+            checkIfPostBelongsToCurrentUser()
         }
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.isHidden = true
+        tabBarController?.tabBar.isHidden = false
     }
 
     //MARK: - Helper Methods
     
     func configureUI() {
+        navigationController?.setStatusBar(backgroundColor: .white)
+
         collectionView.backgroundColor = .white
         collectionView.register(FeedCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.register(FeedHeaderView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: headerId)
      
         let refresher = UIRefreshControl()
         refresher.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         
         if post == nil {
-        navigationItem.title = NavigationItemTitle.forFeedController
         collectionView.refreshControl = refresher
-        } else {
-            navigationItem.title = " "
+        }
+        
+        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            layout.sectionHeadersPinToVisibleBounds = true
         }
     }
+    
+   
     
     //MARK: - API
     
     func fetchPosts() {
         guard post == nil else {return}
-
+        
+        
         PostService.fetchFeedPosts { posts in
             self.posts = posts
             self.checkIfUserLikedPost()
+            self.checkIfPostBelongsToCurrentUser()
             self.collectionView.refreshControl?.endRefreshing()
+        }
+    }
+    
+    func checkIfPostBelongsToCurrentUser() {
+        if let post = post {
+            PostService.checkIfPostBelongsToCurrentUser(post: post) { belongsToUser in
+                self.post?.belongsToCurrentUser = belongsToUser
+            }
+        } else {
+            posts.forEach { post in
+                PostService.checkIfPostBelongsToCurrentUser(post: post) { belongsToUser in
+                    if let index = self.posts.firstIndex(where: {$0.postId == post.postId }) {
+                        self.posts[index].belongsToCurrentUser = belongsToUser
+                    }
+                }
+            }
         }
     }
     
@@ -73,13 +107,17 @@ import UIKit
             }
         } else {
             posts.forEach { post in
-                PostService.checkIfUserLiked(post: post) { isLiked in
+                PostService.checkIfUserLiked(post: post) { didLike in
                     if let index = self.posts.firstIndex(where: {$0.postId == post.postId }) {
-                        self.posts[index].didLike = isLiked
+                        self.posts[index].didLike = didLike
                     }
                 }
             }
         }
+    }
+    
+    func deletePost(post: Post){
+            PostService.deletePost(post: post)
     }
     
     //MARK: - Selectors
@@ -105,14 +143,33 @@ extension FeedController {
         cell.delegate = self
         
         if let post = self.post {
-            cell.viewModel = PostViewModel(post: post)
+            UserService.fetchUser(withUid: post.ownerUid) { user in
+                cell.viewModel = PostViewModel(post: post, user: user)
+            }
         } else {
             let posts = self.posts.sorted {$0.timestamp.compare($1.timestamp) == ComparisonResult.orderedDescending}
             let feedPost = posts[indexPath.row]
-            cell.viewModel = PostViewModel(post: feedPost)
-            
+            UserService.fetchUser(withUid: feedPost.ownerUid) { user in
+                cell.viewModel = PostViewModel(post: feedPost, user: user)
+            }
         }
         return cell
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView,
+                                 viewForSupplementaryElementOfKind kind: String,
+                                 at indexPath: IndexPath) -> UICollectionReusableView {
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+                                                                     withReuseIdentifier: headerId,
+                                                                     for: indexPath) as! FeedHeaderView
+        header.delegate = self
+        if post != nil {
+            header.backButton.isHidden = false
+            header.iconImageView.isHidden = true
+            header.directMessagesButton.isHidden = true
+        }
+        
+        return header
     }
 }
 
@@ -130,10 +187,23 @@ extension FeedController: UICollectionViewDelegateFlowLayout {
         
         return CGSize(width: width, height: height)
     }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        referenceSizeForHeaderInSection section: Int) -> CGSize {
+        if post == nil {
+        return CGSize(width: view.frame.width, height: 60)
+        } else {
+            return CGSize(width: view.frame.width, height: 40)
+        }
+    }
 }
 
 
+//MARK: - FeedCellDelegate
+
 extension FeedController: FeedCellDelegate {
+    
     func cell(_ cell: FeedCell,
               wantsToShowCommentsFor post: Post) {
         
@@ -144,8 +214,7 @@ extension FeedController: FeedCellDelegate {
     func cell(_ cell: FeedCell,
               didLike post: Post) {
         
-        guard let tab = tabBarController as? MainTabController,
-              let currentUser = tab.user else {return}
+        guard let currentUserUid = Auth.auth().currentUser?.uid else {return}
 
         cell.viewModel?.post.didLike.toggle()
         
@@ -167,10 +236,12 @@ extension FeedController: FeedCellDelegate {
                 cell.likeButton.tintColor = .red
                 cell.viewModel?.post.likes = post.likes + 1
                 
-                NotificationService.uploadNotification(toUid: post.ownerUid,
-                                                       fromUser: currentUser,
-                                                       type: .like,
-                                                       post: post)
+                UserService.fetchUser(withUid: currentUserUid) { currentUser in
+                    NotificationService.uploadNotification(toUid: post.ownerUid,
+                                                           fromUser: currentUser,
+                                                           type: .like,
+                                                           post: post)
+                }
             }
         }
     }
@@ -182,5 +253,31 @@ extension FeedController: FeedCellDelegate {
             let controller = ProfileController(user: user)
             self.navigationController?.pushViewController(controller, animated: true)
         }
+    }
+    
+    func cellWantsToShowPostDetails(post: Post) {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let deleteAction = UIAlertAction(title: "Delete post", style: .default) { _ in
+            self.deletePost(post: post)
+            self.fetchPosts()
+            if self.post != nil {
+            self.navigationController?.popViewController(animated: true)
+            }
+        }
+        alert.addAction(cancelAction)
+        alert.addAction(deleteAction)
+        present(alert, animated: true)
+    }
+}
+
+extension FeedController: FeedHeaderViewDelegate {
+    func headerDidTapBackButton() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func headerWantsToShowDirectMessages() {
+    let controller = ConversationsController()
+        navigationController?.pushViewController(controller, animated: true)
     }
 }

@@ -21,9 +21,7 @@ struct NotificationService {
         var data: [String: Any] = ["timestamp" : Timestamp(date: Date()),
                                    "uid" : fromUser.uid,
                                    "type" : type.rawValue,
-                                   "id" : docRef.documentID,
-                                   "userProfileImageUrl" : fromUser.profileImageUrl,
-                                   "username" : fromUser.username]
+                                   "id" : docRef.documentID]
         
         if let post = post {
             data["postId"] = post.postId
@@ -41,6 +39,14 @@ struct NotificationService {
             
             let notifications = documents.map { Notification(dictionary: $0.data())}
             completion(notifications)
+        }
+    }
+    
+    static func checkIfPostStillExists(postId: String, completion: @escaping(Bool) -> Void){
+        
+        API.collectionPosts.document(postId).getDocument { snapshot, error in
+            guard let postExists = snapshot?.exists else {return}
+            completion(postExists)
         }
     }
 }

@@ -16,8 +16,10 @@ struct AuthService {
     
     static func registerUser(withCredentials credentials: AuthCredentials,
                              completion: @escaping(FirestoreCompletion)) {
+        let uuid = NSUUID().uuidString
+        let directoryName = FireStoreDirectory.profileImages
         
-        ImageUploader.uploadImage(image: credentials.profileImage) { imageUrl in
+        ImageService.uploadImage(image: credentials.profileImage, uuid: uuid, directory: directoryName) { imageUrl in
             Auth.auth().createUser(withEmail: credentials.email,
                                    password: credentials.password) { result, error in
                 if let error = error {
@@ -31,7 +33,8 @@ struct AuthService {
                                              "fullname" : credentials.fullname,
                                              "profileImageUrl": imageUrl,
                                              "uid" : uid,
-                                             "username" : credentials.username ]
+                                             "username" : credentials.username,
+                                             "profileImageUid" : uuid]
                 
                     API.collectionUsers.document("\(uid)").setData(data, completion: completion)
             }

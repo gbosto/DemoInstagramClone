@@ -11,6 +11,17 @@ import JGProgressHUD
 extension UIViewController {
     static let hud = JGProgressHUD(style: .dark)
     
+    
+    func configureSearchController(searchController: UISearchController) {
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.placeholder = "Search for a user"
+        navigationItem.searchController = searchController
+        definesPresentationContext = false
+        
+    }
+    
+    
     func configureGradientLayer() {
         let gradient = CAGradientLayer()
         gradient.colors = [UIColor.systemPurple.cgColor, UIColor.systemBlue.cgColor]
@@ -22,10 +33,13 @@ extension UIViewController {
     func showLoader(_ show: Bool) {
         view.endEditing(true)
         
-        if show {
-            UIViewController.hud.show(in: view)
-        } else {
-            UIViewController.hud.dismiss()
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {return}
+            if show {
+                UIViewController.hud.show(in: self.view)
+            } else {
+                UIViewController.hud.dismiss()
+            }
         }
     }
     
@@ -42,8 +56,42 @@ extension UIViewController {
         view.addGestureRecognizer(tap)
     }
     
-    @objc func handleDismissKeyboard(){
+     @objc private func handleDismissKeyboard(){
         view.endEditing(true)
+    }
+    
+    
+    func configureImagePicker() -> UIImagePickerController {
+        let imagePicker = UIImagePickerController()
+        
+        let alert = UIAlertController(title: "Choose Your Profile Picture", message: nil, preferredStyle: .actionSheet)
+        let cancelAction = UIAlertAction(title: "cancel", style: .cancel)
+        let fromCameraAction = UIAlertAction(title: "Take Picture", style: .default) { [weak self] _ in
+            imagePicker.allowsEditing = true
+            imagePicker.sourceType = .camera
+            imagePicker.cameraCaptureMode = .photo
+            imagePicker.cameraDevice = .front
+            imagePicker.showsCameraControls = true
+            imagePicker.isNavigationBarHidden = false
+            imagePicker.isToolbarHidden = true
+            
+            self?.present(imagePicker, animated: true, completion: nil)
+        }
+        
+        let fromLlibraryAction = UIAlertAction(title: "Choose From Library", style: .default) { [weak self] _ in
+            imagePicker.allowsEditing = true
+            imagePicker.sourceType = .photoLibrary
+            
+            self?.present(imagePicker, animated: true, completion: nil)
+        }
+        
+        alert.addAction(fromCameraAction)
+        alert.addAction(fromLlibraryAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
+        
+        return imagePicker
     }
 }
 
@@ -146,12 +194,21 @@ extension UIView {
         anchor(top: view.topAnchor, left: view.leftAnchor,
                bottom: view.bottomAnchor, right: view.rightAnchor)
     }
-    
-    func configureDivider() {
-        let divider = UIView()
-        divider.backgroundColor = .lightGray
-        addSubview(divider)
-        divider.anchor(top: topAnchor, left: leftAnchor,
-                       right: rightAnchor, height: 0.5)
+}
+
+
+extension UINavigationController {
+
+    func setStatusBar(backgroundColor: UIColor) {
+        let statusBarFrame: CGRect
+        if #available(iOS 13.0, *) {
+            statusBarFrame = view.window?.windowScene?.statusBarManager?.statusBarFrame ?? CGRect.zero
+        } else {
+            statusBarFrame = UIApplication.shared.statusBarFrame
+        }
+        let statusBarView = UIView(frame: statusBarFrame)
+        statusBarView.backgroundColor = backgroundColor
+        view.addSubview(statusBarView)
     }
+
 }

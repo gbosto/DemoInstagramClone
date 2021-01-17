@@ -9,18 +9,21 @@ import Firebase
 import UIKit
 
 struct PostService {
+    
     static func uploadPost(caption: String, image: UIImage, user: User,
                            completion: @escaping (FirestoreCompletion)) {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
         
-        ImageUploader.uploadImage(image: image) { imageUrl in
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let uuid = NSUUID().uuidString
+        let directoryName = FireStoreDirectory.posts
+        
+        ImageService.uploadImage(image: image, uuid: uuid, directory: directoryName) { imageUrl in
             let data = ["caption" : caption,
                         "timestamp" : Timestamp(date: Date()),
                         "likes" : 0,
                         "imageUrl" : imageUrl,
                         "ownerUid" : uid,
-                        "ownerImageUrl": user.profileImageUrl,
-                        "ownerUsername": user.username ] as [String : Any]
+                        "imageUid" : uuid] as [String : Any]
             
             let docRef = API.collectionPosts.addDocument(data: data, completion: completion)
             
@@ -57,9 +60,6 @@ struct PostService {
             
             var posts = documents.map { Post(postId: $0.documentID, dictionary: $0.data())}
             
-            posts.sort { (post1, post2) -> Bool in
-                return post1.timestamp.seconds > post2.timestamp.seconds
-            }
             posts.sort { $0.timestamp.seconds > $1.timestamp.seconds}
             
             completion(posts)
@@ -143,6 +143,39 @@ struct PostService {
             }
             
             API.collectionUsers.document(uid).collection("user-feed").document(postId).setData([:])
+        }
+    }
+    
+    static func checkIfPostBelongsToCurrentUser(post: Post, completion: @escaping(Bool) -> Void) {
+            guard let uid = Auth.auth().currentUser?.uid else {return}
+            var belongsTuUser = false
+        
+        fetchPosts(forUser: uid) { currentUserPosts in
+            currentUserPosts.forEach { currentUserPost in
+                if currentUserPost.ownerUid == post.ownerUid {
+                    belongsTuUser = true
+                }
+                completion(belongsTuUser)
+            }
+        }
+    }
+    
+    static func deletePost(post: Post) {
+        guard let currentUseruid = Auth.auth().currentUser?.uid else {return}
+        let directoryName = FireStoreDirectory.posts
+        
+        API.collectionPosts.document(post.postId).delete()
+        API.collectionUsers.document(currentUseruid).collection("user-feed").document(post.postId).delete()
+        ImageService.deleteImage(withUid: post.imageUid, directory: directoryName) { error in
+            if let error = error {
+                print("error while deleting image \(error.localizedDescription)")
+            } 
+        }
+
+        UserService.fetchFollowers(forUid: currentUseruid) { followers in
+            followers.forEach { follower in
+                API.collectionUsers.document(follower.uid).collection("user-feed").document(post.postId).delete()
+            }
         }
     }
 }

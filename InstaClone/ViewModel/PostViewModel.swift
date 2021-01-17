@@ -9,6 +9,7 @@ import UIKit
 
 struct PostViewModel {
     var post: Post
+    var user: User?
     
     var imageUrl: URL? {
         return URL(string: post.imageUrl)
@@ -37,11 +38,17 @@ struct PostViewModel {
     }
     
     var userProfileImageUrl: URL? {
-        return URL(string: post.ownerImageUrl)
+        guard let user = user else {return URL(string: "")}
+        return URL(string: user.profileImageUrl)
     }
     
     var username: String {
-        return post.ownerUsername
+        guard let user = user else {return ""}
+        return user.username
+    }
+    
+    var detailsButtonIsHidden: Bool {
+        return post.belongsToCurrentUser
     }
     
      var timestampString: String? {
@@ -53,7 +60,8 @@ struct PostViewModel {
         return formater.string(from: post.timestamp.dateValue(), to: Date()) ?? ""
     }
     
-    init(post: Post) {
+    init(post: Post, user: User? = nil) {
         self.post = post
+        self.user = user
     }
 }

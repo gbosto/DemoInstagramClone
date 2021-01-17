@@ -9,9 +9,11 @@ import UIKit
 
 struct NotificationViewModel {
     var notification: Notification
+    var user: User
     
-    init(notification: Notification) {
+    init(notification: Notification, user: User) {
         self.notification = notification
+        self.user = user
     }
     
     var postImageUrl: URL? {
@@ -19,7 +21,7 @@ struct NotificationViewModel {
     }
     
     var profileImageUrl: URL? {
-        return URL(string: notification.userProfileImageUrl)
+        return URL(string: user.profileImageUrl)
     }
     
     private var timestampString: String? {
@@ -32,7 +34,7 @@ struct NotificationViewModel {
     }
     
     var notificationMessage: NSAttributedString {
-        let username = notification.username
+        let username = user.username
         let message = notification.type.notificationMessage
         
         let attributedText = NSMutableAttributedString(string: username, attributes: [.font: UIFont.boldSystemFont(ofSize: 14)])

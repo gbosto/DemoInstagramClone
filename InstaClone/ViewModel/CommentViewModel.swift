@@ -8,18 +8,35 @@
 import UIKit
 
 struct CommentViewModel {
-    private let comment: Comment
+    let comment: Comment
+    let user: User?
     
     var profileImageUrl: URL? {
-        return URL(string: comment.profileImageUrl)
+        guard let user = self.user else {return URL(string: "")}
+        return URL(string: user.profileImageUrl)
     }
     
-    init(comment: Comment) {
+    var timestampString: String? {
+        let formater = DateComponentsFormatter()
+        formater.allowedUnits = [.second, .minute, .hour, .day, .weekOfMonth]
+        formater.maximumUnitCount = 1
+        formater.unitsStyle = .abbreviated
+        
+        return formater.string(from: comment.timestamp.dateValue(), to: Date())
+    }
+    
+    var detailsButtonIsHidden: Bool {
+        return comment.commentBelongsToCurrentUser || comment.postBelongsToCurrentUser ? false : true
+    }
+    
+    init(comment: Comment, user: User? = nil) {
         self.comment = comment
+        self.user = user
     }
     
     func commentLabelText() -> NSAttributedString {
-        let attributedString = NSMutableAttributedString(string: comment.username,
+        guard let user = self.user else {return NSAttributedString()}
+        let attributedString = NSMutableAttributedString(string: user.username,
                                                          attributes: [.font: UIFont.boldSystemFont(ofSize: 14)])
         
         attributedString.append(NSAttributedString(string: " \(comment.comment)",
@@ -35,6 +52,9 @@ struct CommentViewModel {
         label.lineBreakMode = .byWordWrapping
         label.setWidth(width)
         
+    
         return label.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
     }
 }
+
+

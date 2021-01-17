@@ -7,8 +7,8 @@
 
 import UIKit
 
-class ProfileCell: UICollectionViewCell {
-    
+class PostCell: UICollectionViewCell {
+        
     var viewModel: PostViewModel? {
         didSet {
             configure()
@@ -16,6 +16,7 @@ class ProfileCell: UICollectionViewCell {
     }
     
     //MARK: - Properties
+    
     private let postImageView: UIImageView = {
         let view = UIImageView()
         view.image = #imageLiteral(resourceName: "venom-7")
@@ -39,8 +40,10 @@ class ProfileCell: UICollectionViewCell {
     //MARK: - Helper Methods
     func configure() {
         guard let viewModel = self.viewModel else {return}
-        
-        postImageView.sd_setImage(with: viewModel.imageUrl)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {return}
+            self.postImageView.sd_setImage(with: viewModel.imageUrl)
+        }
     }
 }
 

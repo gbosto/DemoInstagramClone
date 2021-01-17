@@ -16,11 +16,13 @@ protocol ProfileControllerDelegate: class {
     //MARK: - Properties
     
     private var user: User
+    private var fetchedUser: User?
+    
     private var posts = [Post]()
     weak var delegate: ProfileControllerDelegate?
     
-    private var cellId = ReuseId.forProfileCell
-    private var headerId = ReuseId.forProfileHeader
+    private var cellId = "ProfilePostCell"
+    private var headerId = "HeaderId"
     
     //MARK: - Lifecycle
     
@@ -38,11 +40,13 @@ protocol ProfileControllerDelegate: class {
         configureUI()
         checkIfUserIsFollowed()
         fetchUserStats()
+        fetchPosts()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        fetchPosts()
+//        fetchUser()
+        navigationController?.navigationBar.isHidden = false
     }
     
     //MARK: - API
@@ -69,6 +73,17 @@ protocol ProfileControllerDelegate: class {
         }
     }
     
+    func fetchUser() {
+        UserService.fetchUser(withUid: user.uid) { user in
+            self.user = user
+            self.collectionView.reloadData()
+            self.navigationItem.title = user.username
+            
+        }
+    }
+    
+    
+    
     //MARK: - Selectors
     
     @objc func handleLogout () {
@@ -78,6 +93,7 @@ protocol ProfileControllerDelegate: class {
     @objc func handleRefresh() {
         posts.removeAll()
         fetchUserStats()
+        fetchUser()
         fetchPosts()
         collectionView.reloadData()
     }
@@ -96,8 +112,10 @@ protocol ProfileControllerDelegate: class {
         }
         navigationItem.title = user.username
         collectionView.backgroundColor = .white
-        collectionView.register(ProfileCell.self, forCellWithReuseIdentifier: cellId)
-        collectionView.register(ProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerId)
+        collectionView.register(PostCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.register(ProfileHeader.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: headerId)
     }
 }
 
@@ -111,9 +129,9 @@ extension ProfileController {
     
     override func collectionView(_ collectionView: UICollectionView,
                                  cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ProfileCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! PostCell
         let post = posts[indexPath.row]
-        cell.viewModel = PostViewModel(post: post)
+        cell.viewModel = PostViewModel(post: post, user: user)
         
         return cell
     }
@@ -128,7 +146,6 @@ extension ProfileController {
         header.viewModel = ProfileHeaderViewModel(user: user)
         
         return header
-        
     }
 }
 
@@ -169,7 +186,7 @@ extension ProfileController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: view.frame.width, height: 240)
+        return CGSize(width: view.frame.width, height: 222)
     }
 }
 
@@ -181,7 +198,8 @@ extension ProfileController: ProfileHeaderDelegate {
               let currentUser = tab.user else {return}
         
         if user.isCurrentUser {
-        print("DEBUG: Handle edit profile")
+        let controller = EditProfileController(user: user)
+            navigationController?.pushViewController(controller, animated: true)
         } else {
         
         if user.isFollowed {
@@ -206,4 +224,12 @@ extension ProfileController: ProfileHeaderDelegate {
             }
         }
     }
+    
+    func header(wantsToShowUserFollowers show: Bool) {
+        let controller = FollowersController(user: user, showFollowers: show)
+        
+        navigationController?.pushViewController(controller, animated: true)
+    }
 }
+
+

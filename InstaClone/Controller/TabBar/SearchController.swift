@@ -13,8 +13,8 @@ import UIKit
     
     
     private let collectionView = UICollectionView(frame: .zero,
-                                                       collectionViewLayout: UICollectionViewFlowLayout())
-    private let collectionViewCellId = ReuseId.forSearchCollectionViewCell
+                                                  collectionViewLayout: UICollectionViewFlowLayout())
+    private let collectionViewCellId = "PostCell"
     private var posts = [Post]()
 
     
@@ -24,7 +24,7 @@ import UIKit
     }
 
     private let tableView = UITableView()
-    private let tableViewCellId = ReuseId.forSearchTableViewCell
+    private let tableViewCellId = "SearchCell"
     
     private var users = [User]()
     private var filteredUsers = [User]()
@@ -34,21 +34,27 @@ import UIKit
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureUI()
-        fetchUsers()
-        fetchPosts()
+        
+        configureTableView()
+        configureCollectionView()
+        configuraSearchController()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchPosts()
+        fetchUsers()
+        navigationController?.navigationBar.isHidden = false
+    }
+    
+    func configuraSearchController() {
+        configureSearchController(searchController: searchController)
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.delegate = self
+    }
 
     
     //MARK: - Helper Methods
-    
-    func configureUI(){
-        navigationItem.title = "Explore"
-        configureTableView()
-        configureCollectionView()
-        configureSearchController()
-    }
     
     func configureTableView() {
         view.addSubview(tableView)
@@ -57,7 +63,7 @@ import UIKit
         tableView.dataSource = self
         
         tableView.backgroundColor = .white
-        tableView.register(SearchCell.self, forCellReuseIdentifier: tableViewCellId)
+        tableView.register(UserCell.self, forCellReuseIdentifier: tableViewCellId)
         tableView.rowHeight = 64
         tableView.tableFooterView = UIView()
         
@@ -71,33 +77,27 @@ import UIKit
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.backgroundColor = .white
-        collectionView.register(ProfileCell.self, forCellWithReuseIdentifier: collectionViewCellId)
-        
-        
-    }
-    
-    func configureSearchController() {
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.placeholder = "Search for a user"
-        searchController.searchBar.delegate = self
-        navigationItem.searchController = searchController
-        definesPresentationContext = false
+        collectionView.register(PostCell.self, forCellWithReuseIdentifier: collectionViewCellId)
+
     }
     
     
     //MARK: - API
     
     func fetchUsers() {
+        showLoader(true)
+        
         UserService.fetchUsers { users in
+            self.showLoader(false)
             self.users = users
             self.tableView.reloadData()
         }
     }
     
     func fetchPosts() {
+        showLoader(true)
         PostService.fetchPosts { posts in
+            self.showLoader(false)
             self.posts = posts
             self.collectionView.reloadData()
         }
@@ -112,11 +112,10 @@ extension SearchController: UITableViewDataSource {
     }
     
      func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: tableViewCellId, for: indexPath) as! SearchCell
-        
+        let cell = tableView.dequeueReusableCell(withIdentifier: tableViewCellId, for: indexPath) as! UserCell
         if inSearchMode {
             let user = filteredUsers[indexPath.row]
-            cell.viewModel = SearchCellViewModel(user: user)
+            cell.viewModel = UserCellViewModel(user: user)
         }
         return cell
     }
@@ -140,7 +139,7 @@ extension SearchController: UISearchResultsUpdating, UISearchControllerDelegate 
     func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text?.lowercased() else {return}
         
-        filteredUsers = users.filter({  $0.username.contains(searchText) || $0.fullname.lowercased().contains(searchText)    })
+        filteredUsers = users.filter({  $0.username.contains(searchText) || $0.fullname.lowercased().contains(searchText)})
         self.tableView.reloadData()
     }
 }
@@ -175,7 +174,7 @@ extension SearchController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionViewCellId, for: indexPath) as! ProfileCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionViewCellId, for: indexPath) as! PostCell
         let post = posts[indexPath.row]
         cell.viewModel = PostViewModel(post: post)
         

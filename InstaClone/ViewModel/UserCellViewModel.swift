@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SearchCellViewModel {
+struct UserCellViewModel {
     let user: User
     
     var username: String {

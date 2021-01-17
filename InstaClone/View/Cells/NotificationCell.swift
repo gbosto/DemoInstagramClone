@@ -101,7 +101,6 @@ class NotificationCell: UITableViewCell{
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     //MARK: - Helper Methods
     
     func configure() {
@@ -138,6 +137,4 @@ class NotificationCell: UITableViewCell{
         
         delegate.cell(self, wantsToViewPost: postId)
     }
-    
-    
 }

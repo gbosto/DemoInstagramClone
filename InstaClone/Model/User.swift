@@ -13,6 +13,7 @@ struct User {
     let profileImageUrl: String
     let username: String
     let uid: String
+    let profileImageUid: String
     
     var isFollowed = false
     
@@ -28,7 +29,8 @@ struct User {
         self.profileImageUrl = dictionary["profileImageUrl"] as? String ?? " "
         self.username = dictionary["username"] as? String ?? " "
         self.uid = dictionary["uid"] as? String ?? " "
-        
+        self.profileImageUid = dictionary["profileImageUid"] as? String ?? " "
+
         self.stats = UserStats(followers: 0, following: 0, posts: 0)
     }
 }

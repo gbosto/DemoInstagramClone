@@ -14,6 +14,7 @@ import UIKit
     private var viewModel = RegistrationViewModel()
     private var profileImage: UIImage?
     weak var delegate: AuthenticationDelegate?
+    private var isSecured: Bool = true
     
     private let emailTextField = AuthenticationTextField(placeholder: "Email", type: .emailAddress)
     private let passwordTextField = AuthenticationTextField(placeholder: "Password",  secureTextEntry: true)
@@ -22,20 +23,25 @@ import UIKit
     private let signUpButton = AuthenticationButton(title: "Sign Up")
     private let alreadyHaveAnAccountButton = AttributedButton(text: "Already have an Account?",
                                                                     boldText: "Log In")
-    private let plusPhotoButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(#imageLiteral(resourceName: "Plus_photo_icon"), for: .normal)
-        button.tintColor = .lightGray
-        button.setDimensions(height: 140, width: 140)
-        button.addTarget(self, action: #selector(handleProfilePhotoSelect), for: .touchUpInside)
+    private let toggleSecureTextButton = TogglePasswordButton(type: .system)
+    private let profileImageView: UIImageView = {
+        let view = UIImageView()
+        view.image = UIImage(systemName: "person.crop.circle.fill")
+        view.tintColor = .lightGray
+        view.setDimensions(height: 120, width: 120)
+        view.layer.cornerRadius = 120 / 2
         
+        return view
+    }()
+    private let addPhotoButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Add Profile Photo", for: .normal)
+        button.setDimensions(height: 40, width: 120)
+        button.addTarget(self, action: #selector(handleProfilePhotoSelect), for: .touchUpInside)
+
         return button
     }()
-    
-    private var isSecured: Bool = true
-    private let toggleSecureTextButton = TogglePasswordButton(type: .system)
-
-    
+   
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -49,9 +55,13 @@ import UIKit
     func configureUI() {
         view.backgroundColor = .white
 
-        view.addSubview(plusPhotoButton)
-        plusPhotoButton.centerX(inView: view)
-        plusPhotoButton.anchor(top: view.safeAreaLayoutGuide.topAnchor, paddingTop: 32)
+        view.addSubview(profileImageView)
+        profileImageView.centerX(inView: view)
+        profileImageView.anchor(top: view.safeAreaLayoutGuide.topAnchor, paddingTop: 32)
+        
+        view.addSubview(addPhotoButton)
+        addPhotoButton.centerX(inView: view)
+        addPhotoButton.anchor(top: profileImageView.bottomAnchor)
         
         configureStack()
         
@@ -73,8 +83,8 @@ import UIKit
         stack.spacing = 15
         
         view.addSubview(stack)
-        stack.anchor(top: plusPhotoButton.bottomAnchor, left: view.leftAnchor, right: view.rightAnchor,
-                     paddingTop: 20, paddingLeft: 32, paddingRight: 32)
+        stack.anchor(top: addPhotoButton.bottomAnchor, left: view.leftAnchor, right: view.rightAnchor,
+                     paddingTop: 12, paddingLeft: 32, paddingRight: 32)
         
         emailTextField.delegate = self
         passwordTextField.delegate = self
@@ -114,35 +124,8 @@ import UIKit
     }
     
     @objc func handleProfilePhotoSelect() {
-        let imagePicker = UIImagePickerController()
-            imagePicker.delegate = self
-        
-        let alert = UIAlertController(title: "Choose Your Profile Picture", message: nil, preferredStyle: .actionSheet)
-        let cancelAction = UIAlertAction(title: "cancel", style: .cancel)
-        let fromCameraAction = UIAlertAction(title: "Take Picture", style: .default) { [weak self] _ in
-            imagePicker.allowsEditing = true
-            imagePicker.sourceType = .camera
-            imagePicker.cameraCaptureMode = .photo
-            imagePicker.cameraDevice = .front
-            imagePicker.showsCameraControls = true
-            imagePicker.isNavigationBarHidden = false
-            imagePicker.isToolbarHidden = true
-            
-            self?.present(imagePicker, animated: true, completion: nil)
-        }
-        
-        let fromLlibraryAction = UIAlertAction(title: "Choose From Library", style: .default) { [weak self] _ in
-            imagePicker.allowsEditing = true
-            imagePicker.sourceType = .photoLibrary
-            
-            self?.present(imagePicker, animated: true, completion: nil)
-        }
-        
-        alert.addAction(fromCameraAction)
-        alert.addAction(fromLlibraryAction)
-        alert.addAction(cancelAction)
-        
-        present(alert, animated: true)
+        let picker = configureImagePicker()
+        picker.delegate = self
     }
     
     @objc func handleSignUp() {
@@ -198,12 +181,11 @@ extension RegistrationController: UIImagePickerControllerDelegate, UINavigationC
         guard let image = info[.editedImage] as? UIImage else {return}
         profileImage = image
         
-        plusPhotoButton.layer.cornerRadius = plusPhotoButton.frame.width / 2
-        plusPhotoButton.layer.masksToBounds = true
-        plusPhotoButton.layer.borderColor = UIColor.white.cgColor
-        plusPhotoButton.layer.borderWidth = 2
-        plusPhotoButton.setImage(image.withRenderingMode((.alwaysOriginal)), for: .normal)
-        
+        profileImageView.layer.masksToBounds = true
+        profileImageView.layer.borderColor = UIColor.white.cgColor
+        profileImageView.layer.borderWidth = 2
+        profileImageView.image = image.withRenderingMode((.alwaysOriginal))
+                
         picker.dismiss(animated: true, completion: nil)
         
     }

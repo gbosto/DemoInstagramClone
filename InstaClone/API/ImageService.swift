@@ -7,15 +7,15 @@
 
 import FirebaseStorage
 
-struct ImageUploader {
+struct ImageService {
     
-    static func uploadImage(image: UIImage,
+    static func uploadImage(image: UIImage, uuid: String, directory: String,
                             competion: @escaping(String)-> Void) {
         
         guard let imageData = image.jpegData(compressionQuality: 0.75) else {return}
         
-        let fileName = NSUUID().uuidString
-        let reference = Storage.storage().reference(withPath: "/profile_images/\(fileName)")
+        
+        let reference = Storage.storage().reference(withPath: "\(directory)\(uuid)")
         
         reference.putData(imageData, metadata: nil) { metadata, error in
             if let error = error {
@@ -28,6 +28,13 @@ struct ImageUploader {
                 competion(imageUrl)
             }
         }
+    }
+    
+    static func deleteImage(withUid uuid: String, directory: String, completion: @escaping(FirestoreCompletion)) {
+        
+        let reference = Storage.storage().reference(withPath: "\(directory)\(uuid)")
+        
+        reference.delete(completion: completion)
     }
 }
 
