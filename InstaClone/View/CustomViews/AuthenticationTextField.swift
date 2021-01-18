@@ -19,7 +19,6 @@ import UIKit
         leftView = spacer
         leftViewMode = .always
 
-
         keyboardType = type
         layer.cornerRadius = 5
         enablesReturnKeyAutomatically = true

@@ -16,7 +16,9 @@ class ChatController: UICollectionViewController {
     private var messages = [Message]()
     
     override var  inputAccessoryView: UIView? {
-        get {return customInputView}
+        get {
+            return customInputView
+        }
     }
     
     override var canBecomeFirstResponder: Bool {

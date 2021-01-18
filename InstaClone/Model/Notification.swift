@@ -31,12 +31,14 @@ struct Notification {
     let postImageUrl: String?
     let type: NotificationType
     let timestamp: Timestamp
+    let toUid: String
     
     var userIsFollowed = false
     
     init(dictionary: [String: Any]) {
         self.uid = dictionary["uid"] as? String ?? ""
         self.id = dictionary["id"] as? String ?? ""
+        self.toUid = dictionary["toUid"] as? String ?? ""
         self.postId = dictionary["postId"] as? String ?? ""
         self.postImageUrl = dictionary["postImageUrl"] as? String ?? ""
         self.type = NotificationType(rawValue: dictionary["type"] as? Int ?? 0) ?? .like

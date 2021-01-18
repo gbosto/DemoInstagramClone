@@ -129,6 +129,7 @@ class NotificationCell: UITableViewCell{
         } else {
             delegate?.cell(self, wantsToFollow: viewModel.notification.uid)
         }
+        
     }
     
     @objc func handlePostTapped () {

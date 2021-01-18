@@ -16,7 +16,6 @@ protocol ProfileControllerDelegate: class {
     //MARK: - Properties
     
     private var user: User
-    private var fetchedUser: User?
     
     private var posts = [Post]()
     weak var delegate: ProfileControllerDelegate?
@@ -39,13 +38,13 @@ protocol ProfileControllerDelegate: class {
         super.viewDidLoad()
         configureUI()
         checkIfUserIsFollowed()
-        fetchUserStats()
         fetchPosts()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        fetchUser()
+        fetchUser()
+        fetchUserStats()
         navigationController?.navigationBar.isHidden = false
     }
     
@@ -78,7 +77,6 @@ protocol ProfileControllerDelegate: class {
             self.user = user
             self.collectionView.reloadData()
             self.navigationItem.title = user.username
-            
         }
     }
     
@@ -93,12 +91,12 @@ protocol ProfileControllerDelegate: class {
     @objc func handleRefresh() {
         posts.removeAll()
         fetchUserStats()
-        fetchUser()
         fetchPosts()
         collectionView.reloadData()
     }
  
     //MARK: - Helper Methods
+    
     func configureUI() {
         let refresher = UIRefreshControl()
         refresher.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)

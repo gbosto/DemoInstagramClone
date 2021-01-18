@@ -23,6 +23,7 @@ class TogglePasswordButton: UIButton {
         let image = UIImage(systemName: "eye.slash")
         tintColor = .lightGray
         setImage(image, for: .normal)
+        isUserInteractionEnabled = true
         setDimensions(height: 15, width: 25)
         
         addTarget(self, action: #selector(handleToggleSecureText), for: .touchUpInside)

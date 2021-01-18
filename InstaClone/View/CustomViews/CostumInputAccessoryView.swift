@@ -99,11 +99,11 @@ class CostumInputAccessoryView: UIView {
     @objc func textDidChange() {
         placeholderLabel.isHidden = !commentTextView.text.isEmpty
         postButton.isHidden = commentTextView.text.isEmpty
-        postButton.isEnabled = !commentTextView.text.isEmpty
     }
     //MARK: - Helpers
     
     func clearInputTextView() {
+        postButton.isHidden = true
         commentTextView.text = nil
         placeholderLabel.isHidden = false
     }

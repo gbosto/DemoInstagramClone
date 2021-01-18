@@ -6,7 +6,6 @@
 //
 
 
-
 import Firebase
 
  class NotificationsController: UITableViewController {
@@ -104,7 +103,6 @@ extension NotificationsController {
                             didSelectRowAt indexPath: IndexPath) {
         showLoader(true)
         let uid = notifications[indexPath.row].uid
-        guard let postId = notifications[indexPath.row].postId else {return}
         
         UserService.fetchUser(withUid: uid) { user in
             self.showLoader(false)
@@ -127,7 +125,11 @@ extension NotificationsController: NotificationCellDelegate {
                 cell.viewModel?.notification.userIsFollowed.toggle()
                 NotificationService.uploadNotification(toUid: uid, fromUser: currentUser, type: .follow)
             }
-        }      
+        }
+        UserService.fetchUser(withUid: uid) { user in
+            PostService.updateUserFeedAfterFollowing(user: user, didFollow: true)
+        }
+
     }
     
     func cell(_ cell: NotificationCell, wantsToUnfollow uid: String) {
@@ -135,6 +137,9 @@ extension NotificationsController: NotificationCellDelegate {
         UserService.unfollow(uid: uid) { _ in
             self.showLoader(false)
             cell.viewModel?.notification.userIsFollowed.toggle()
+        }
+        UserService.fetchUser(withUid: uid) { user in
+            PostService.updateUserFeedAfterFollowing(user: user, didFollow: false)
         }
     }
     
