@@ -9,7 +9,7 @@ import Foundation
 
 
 struct ConversationViewModel {
-    private let conversation: Conversation
+    let conversation: Conversation
     
     var profileImageUrl: URL? {
         return URL(string: conversation.user.profileImageUrl)

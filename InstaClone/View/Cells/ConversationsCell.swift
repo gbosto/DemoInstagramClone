@@ -11,7 +11,7 @@ class ConversationCell: UITableViewCell {
     
     //MARK: - Properties
     
-    var conversation: Conversation? {
+    var viewModel: ConversationViewModel? {
         didSet {
             configure()
         }
@@ -77,11 +77,10 @@ class ConversationCell: UITableViewCell {
     //MARK: - Helpers
     
     func configure() {
-        guard let conversation = conversation else {return}
-        let viewModel = ConversationViewModel(conversation: conversation)
+        guard let viewModel = viewModel else {return}
         
-        usernameLabel.text = conversation.user.username
-        messageTextLabel.text = conversation.message.text
+        usernameLabel.text = viewModel.conversation.user.username
+        messageTextLabel.text = viewModel.conversation.message.text
         timestampLabel.text = viewModel.timestamp
         profileImageView.sd_setImage(with: viewModel.profileImageUrl)
     }

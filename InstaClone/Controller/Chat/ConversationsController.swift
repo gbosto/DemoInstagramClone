@@ -73,7 +73,8 @@ extension ConversationsController {
                             cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! ConversationCell
         let conversation = conversations[indexPath.row]
-        cell.conversation = conversation
+        let viewModel = ConversationViewModel(conversation: conversation)
+        cell.viewModel = viewModel
         
         return cell
     }
