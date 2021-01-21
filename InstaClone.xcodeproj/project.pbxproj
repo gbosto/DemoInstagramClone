@@ -36,7 +36,6 @@
 		CE98648B25B2B7FD0040C045 /* ConversationsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE98648A25B2B7FD0040C045 /* ConversationsCell.swift */; };
 		CEB2C15925A368470067740A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB2C15825A368470067740A /* AppDelegate.swift */; };
 		CEB2C15B25A368470067740A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB2C15A25A368470067740A /* SceneDelegate.swift */; };
-		CEB2C15D25A368470067740A /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB2C15C25A368470067740A /* Sample.swift */; };
 		CEB2C16525A368480067740A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEB2C16325A368480067740A /* LaunchScreen.storyboard */; };
 		CEB2C19B25A36FF70067740A /* MainTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB2C19A25A36FF70067740A /* MainTabController.swift */; };
 		CEB2C19E25A373B10067740A /* AuthCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB2C19D25A373B10067740A /* AuthCredentials.swift */; };
@@ -109,7 +108,6 @@
 		CEB2C15525A368470067740A /* InstaClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstaClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEB2C15825A368470067740A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CEB2C15A25A368470067740A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		CEB2C15C25A368470067740A /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		CEB2C16425A368480067740A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CEB2C16625A368480067740A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CEB2C19A25A36FF70067740A /* MainTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabController.swift; sourceTree = "<group>"; };
@@ -250,7 +248,6 @@
 				CEB2C18E25A36F3A0067740A /* API */,
 				CEB2C18D25A36F390067740A /* Utilities */,
 				CEB2C18C25A36F380067740A /* Helper */,
-				CEB2C15C25A368470067740A /* Sample.swift */,
 				CEB2C16325A368480067740A /* LaunchScreen.storyboard */,
 				CEB2C23225A382800067740A /* Assets.xcassets */,
 				CEB2C22E25A381DF0067740A /* GoogleService-Info.plist */,
@@ -511,7 +508,6 @@
 				CEB2C1E625A376CB0067740A /* PostViewModel.swift in Sources */,
 				CE52349525AAF13A00FF5852 /* ResetpasswordViewModel.swift in Sources */,
 				CE98648B25B2B7FD0040C045 /* ConversationsCell.swift in Sources */,
-				CEB2C15D25A368470067740A /* Sample.swift in Sources */,
 				CEB2C22925A380F70067740A /* UploadPostController.swift in Sources */,
 				CEB2C1DB25A376740067740A /* RegistrationViewModel.swift in Sources */,
 				CEB2C1EA25A3776C0067740A /* LoginController.swift in Sources */,
