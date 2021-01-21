@@ -11,21 +11,21 @@ struct CommentService {
     static func uploadComments(comment: String, postID: String, user: User,
                                completion: @escaping(FirestoreCompletion)) {
         
-        let docRef = API.collectionPosts.document(postID).collection("comments").document()
+        let docRef = API.collectionPosts.document(postID).collection(Resources.comments).document()
         
-        let data: [String:Any] = ["uid" : user.uid,
-                                   "comment" : comment,
-                                   "timestamp" : Timestamp(date: Date()),
-                                   "username" : user.username,
-                                   "profileImageUrl" : user.profileImageUrl,
-                                   "commentId" : docRef.documentID]
+        let data: [String:Any] = [  Resources.uid : user.uid,
+                                    Resources.comment : comment,
+                                    Resources.timestamp : Timestamp(date: Date()),
+                                    Resources.username : user.username,
+                                    Resources.profileImageUrl : user.profileImageUrl,
+                                    Resources.commentId : docRef.documentID]
         
         docRef.setData(data, completion: completion)
     }
     
     static func fetchComments (forPost postID: String, completion: @escaping([Comment]) -> Void) {
         var comments = [Comment]()
-        let query = API.collectionPosts.document(postID).collection("comments").order(by: "timestamp", descending: true)
+        let query = API.collectionPosts.document(postID).collection(Resources.comments).order(by: Resources.timestamp, descending: true)
         
         query.addSnapshotListener { snapshot, error in
             snapshot?.documentChanges.forEach({ change in
@@ -50,6 +50,6 @@ struct CommentService {
     }
     
     static func deleteComment(forPost post: Post, comment: Comment) {
-        API.collectionPosts.document(post.postId).collection("comments").document(comment.commentId).delete()
+        API.collectionPosts.document(post.postId).collection(Resources.comments).document(comment.commentId).delete()
     }
 }

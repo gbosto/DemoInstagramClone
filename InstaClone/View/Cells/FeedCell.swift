@@ -12,9 +12,8 @@ protocol FeedCellDelegate: class {
     func cell(_ cell: FeedCell, wantsToShowCommentsFor post: Post )
     func cell(_ cell: FeedCell, didLike post: Post)
     func cell(_ cell: FeedCell, wantsToShowProfileFor uid: String)
-    func cellWantsToShowPostDetails(post: Post)
+    func cell(_ cell: FeedCell, wantsToShowDetailsFor post: Post)
 }
-
 
  class FeedCell: UICollectionViewCell {
     
@@ -218,7 +217,7 @@ protocol FeedCellDelegate: class {
         
     @objc func handleDetailsButtonTapped() {
         guard let viewModel = viewModel else {return}
-        delegate?.cellWantsToShowPostDetails(post: viewModel.post)
+        delegate?.cell(self, wantsToShowDetailsFor: viewModel.post)
     }
     
 }

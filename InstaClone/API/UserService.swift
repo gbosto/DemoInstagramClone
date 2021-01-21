@@ -39,36 +39,37 @@ struct UserService {
     
     static func follow(uid: String, completion: @escaping(FirestoreCompletion)) {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
-        API.collectionFollowing.document(currentUid).collection("user-following").document(uid).setData([:]) { error in
-            API.collectionFollowers.document(uid).collection("user-followers").document(currentUid).setData([:], completion: completion)
+        API.collectionFollowing.document(currentUid).collection(Resources.userFollowing).document(uid).setData([:]) { error in
+            API.collectionFollowers.document(uid).collection(Resources.userFollowers).document(currentUid).setData([:], completion: completion)
         }
     }
     
     static func unfollow(uid: String, completion: @escaping(FirestoreCompletion)) {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
-        API.collectionFollowing.document(currentUid).collection("user-following").document(uid).delete { error in
-            API.collectionFollowers.document(uid).collection("user-followers").document(currentUid).delete(completion: completion)
+        API.collectionFollowing.document(currentUid).collection(Resources.userFollowing).document(uid).delete { error in
+            API.collectionFollowers.document(uid).collection(Resources.userFollowers).document(currentUid).delete(completion: completion)
         }
     }
     
     static func checkIfUserIsFollowed(uid: String, completion : @escaping(Bool)-> Void) {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
         
-        API.collectionFollowing.document(currentUid).collection("user-following").document(uid)
+        API.collectionFollowing.document(currentUid).collection(Resources.userFollowing).document(uid)
             .getDocument {snapshot, error  in
                 guard let isFollowed = snapshot?.exists else {return}
                 completion(isFollowed)
         }
     }
+
     
     static func fetchUserStats(uid: String, completion: @escaping(UserStats) -> Void) {
-        API.collectionFollowers.document(uid).collection("user-followers").getDocuments { snapshot, _ in
+        API.collectionFollowers.document(uid).collection(Resources.userFollowers).getDocuments { snapshot, _ in
             let followers = snapshot?.documents.count ?? 0
             
-            API.collectionFollowing.document(uid).collection("user-following").getDocuments { snapshot, _ in
+            API.collectionFollowing.document(uid).collection(Resources.userFollowing).getDocuments { snapshot, _ in
                 let following = snapshot?.documents.count ?? 0
                 
-                API.collectionPosts.whereField("ownerUid", isEqualTo: uid).getDocuments { snapshot, _ in
+                API.collectionPosts.whereField(Resources.ownerUid, isEqualTo: uid).getDocuments { snapshot, _ in
                     let posts = snapshot?.documents.count ?? 0
                     
                     completion(UserStats(followers: followers, following: following, posts: posts))
@@ -81,7 +82,7 @@ struct UserService {
     static func fetchFollowers(forUid uid: String, completion: @escaping([User]) -> Void) {
         var users = [User]()
         
-        API.collectionFollowers.document(uid).collection("user-followers").getDocuments { (snapshot, error) in
+        API.collectionFollowers.document(uid).collection(Resources.userFollowers).getDocuments { (snapshot, error) in
             guard let documents = snapshot?.documents else {return}
             documents.forEach { document in
                 UserService.fetchUser(withUid: document.documentID) { user in
@@ -95,7 +96,7 @@ struct UserService {
     static func fetchFollowing(forUid uid: String, completion: @escaping([User]) -> Void) {
         var users = [User]()
         
-        API.collectionFollowing.document(uid).collection("user-following").getDocuments { (snapshot, error) in
+        API.collectionFollowing.document(uid).collection(Resources.userFollowing).getDocuments { (snapshot, error) in
             guard let documents = snapshot?.documents else {return}
             documents.forEach { document in
                 UserService.fetchUser(withUid: document.documentID) { user in
@@ -105,44 +106,22 @@ struct UserService {
             }
         }
     }
-    
-    
-    static func changeUser(user: User, name: String, completion: @escaping(FirestoreCompletion)) {
+  
+    static func changeUser(user: User, name: String) {
         guard let currentUserUid = Auth.auth().currentUser?.uid else {return}
         
-        let data: [String : Any] = [ "email" : user.email,
-                                     "fullname" : name,
-                                     "profileImageUrl": user.profileImageUrl,
-                                     "uid" : user.uid,
-                                     "username" : user.username,
-                                     "profileImageUid" : user.profileImageUid]
-        
-        API.collectionUsers.document(currentUserUid).setData(data, completion: completion)
+        API.collectionUsers.document(currentUserUid).updateData([Resources.fullname: name])
     }
     
-    static func changeUser(user: User, username: String, completion: @escaping(FirestoreCompletion)) {
+    static func changeUser(user: User, username: String) {
         guard let currentUserUid = Auth.auth().currentUser?.uid else {return}
         
-        let data: [String : Any] = [ "email" : user.email,
-                                     "fullname" : user.fullname,
-                                     "profileImageUrl": user.profileImageUrl,
-                                     "uid" : user.uid,
-                                     "username" : username,
-                                     "profileImageUid" : user.profileImageUid]
-        
-        API.collectionUsers.document(currentUserUid).setData(data, completion: completion)
+        API.collectionUsers.document(currentUserUid).updateData([Resources.username: username])
     }
     
-    static func changeUsersProfileImageUrl(user: User, url: String, completion: @escaping(FirestoreCompletion)) {
+    static func changeUsersProfileImageUrl(user: User, url: String) {
         guard let currentUserUid = Auth.auth().currentUser?.uid else {return}
         
-        let data: [String : Any] = [ "email" : user.email,
-                                     "fullname" : user.fullname,
-                                     "profileImageUrl": url,
-                                     "uid" : user.uid,
-                                     "username" : user.username,
-                                     "profileImageUid" : user.profileImageUid]
-        
-        API.collectionUsers.document(currentUserUid).setData(data, completion: completion)
+        API.collectionUsers.document(currentUserUid).updateData([Resources.profileImageUrl: url])
     }
 }

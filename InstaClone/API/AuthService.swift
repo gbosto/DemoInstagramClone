@@ -7,6 +7,10 @@
 
 import Firebase
 
+
+
+
+
 struct AuthService {
     
     static func logUserIn(withEmail email: String, password: String,
@@ -29,12 +33,12 @@ struct AuthService {
                 
                 guard let uid = result?.user.uid else {return}
                 
-                let data: [String : Any] = [ "email" : credentials.email,
-                                             "fullname" : credentials.fullname,
-                                             "profileImageUrl": imageUrl,
-                                             "uid" : uid,
-                                             "username" : credentials.username,
-                                             "profileImageUid" : uuid]
+                let data: [String : Any] = [ Resources.email : credentials.email,
+                                             Resources.fullname : credentials.fullname,
+                                             Resources.profileImageUrl : imageUrl,
+                                             Resources.uid : uid,
+                                             Resources.username : credentials.username,
+                                             Resources.profileImageUid : uuid]
                 
                     API.collectionUsers.document("\(uid)").setData(data, completion: completion)
             }

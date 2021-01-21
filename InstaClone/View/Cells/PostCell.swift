@@ -19,7 +19,6 @@ class PostCell: UICollectionViewCell {
     
     private let postImageView: UIImageView = {
         let view = UIImageView()
-        view.image = #imageLiteral(resourceName: "venom-7")
         view.contentMode = .scaleAspectFill
         view.clipsToBounds = true
         

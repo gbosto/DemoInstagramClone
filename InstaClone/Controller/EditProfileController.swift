@@ -73,11 +73,7 @@ class EditProfileController: UIViewController {
 
             let uuid = NSUUID().uuidString
             ImageService.uploadImage(image: image, uuid: uuid, directory: FireStoreDirectory.profileImages) { imageUrl in
-                UserService.changeUsersProfileImageUrl(user: self.user, url: imageUrl) { error in
-                    if let error = error {
-                        print(error.localizedDescription)
-                    }
-                }
+                UserService.changeUsersProfileImageUrl(user: self.user, url: imageUrl)
             }
         }
     }
@@ -142,13 +138,13 @@ class EditProfileController: UIViewController {
         //MARK: - Delegate
 
 extension EditProfileController: EditProfileViewDelegate {
-    func viewWantsToEditName() {
+    func viewWantsToEditName(_ view: EditProfileView) {
         let title = "name"
         let controller = EditInfoController(title: title, user: user, forUsersName: true)
         navigationController?.pushViewController(controller, animated: true)
     }
     
-    func viewWantsToEditUserName() {
+    func viewWantsToEditUserName(_ view: EditProfileView) {
         let title = "username"
         let controller = EditInfoController(title: title, user: user, forUsersName: false)
         navigationController?.pushViewController(controller, animated: true)

@@ -14,7 +14,6 @@ import UIKit
     private var viewModel = RegistrationViewModel()
     private var profileImage: UIImage?
     weak var delegate: AuthenticationDelegate?
-    private var isSecured: Bool = true
     
     private let emailTextField = AuthenticationTextField(placeholder: "Email", type: .emailAddress)
     private let passwordTextField = AuthenticationTextField(placeholder: "Password",  secureTextEntry: true)
@@ -50,8 +49,18 @@ import UIKit
         dismissKeyboard()
     }
     
-    //MARK: - Helper Methods
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setObservers()
+    }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeObservers()
+    }
+    
+    //MARK: - Helper Methods
+
     func configureUI() {
         view.backgroundColor = .white
 
@@ -69,11 +78,6 @@ import UIKit
         alreadyHaveAnAccountButton.addTarget(self, action: #selector(handleShowLogin), for: .touchUpInside)
         alreadyHaveAnAccountButton.centerX(inView: view)
         alreadyHaveAnAccountButton.anchor(bottom: view.safeAreaLayoutGuide.bottomAnchor, paddingBottom: 16)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow),
-                                               name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide),
-                                               name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     func configureStack() {
@@ -103,6 +107,19 @@ import UIKit
         usernameTextField.addTarget(self, action: #selector(textDidChange), for: .editingChanged)
         signUpButton.addTarget(self, action: #selector(handleSignUp), for: .touchUpInside)
     }
+    
+    func setObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide),
+                                               name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    func removeObservers() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
 
     //MARK: - Selectors
     
@@ -216,7 +233,10 @@ extension RegistrationController: UITextFieldDelegate {
 extension RegistrationController: TogglePasswordButtonDelegate {
     func buttonPressed(button: TogglePasswordButton) {
         button.isSecured.toggle()
-        var buttonImage: UIImage {return button.isSecured ? UIImage(systemName: "eye.slash")! : UIImage(systemName: "eye")!}
+        guard let eyeSlashImage = UIImage(systemName: "eye.slash"),
+              let eyeImage = UIImage(systemName: "eye") else {return}
+        
+        var buttonImage: UIImage {return button.isSecured ? eyeSlashImage : eyeImage}
         var buttonTintColor: UIColor {return button.isSecured ? .lightGray : .black}
         
         toggleSecureTextButton.setImage(buttonImage, for: .normal)

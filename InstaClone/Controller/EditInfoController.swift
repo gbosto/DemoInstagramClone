@@ -97,20 +97,9 @@ class EditInfoController: UIViewController {
        guard let newInfo = editInfoTextField.text else {return}
         
         if forUsersName {
-            UserService.changeUser(user: user, name: newInfo ) { error in
-                if let error = error {
-                    print("DEBUG: error while updateing user's name \(error.localizedDescription)")
-                }
-                print("DEBUG: user's name updated successfully")
-            }
-        }
-        else {
-            UserService.changeUser(user: user, username: newInfo) { error in
-                if let error = error {
-                    print("DEBUG: error while updateing user's username \(error.localizedDescription)")
-                }
-                print("DEBUG: user's username updated successfully")
-            }
+            UserService.changeUser(user: user, name: newInfo)
+        } else {
+            UserService.changeUser(user: user, username: newInfo)
         }
     }
     

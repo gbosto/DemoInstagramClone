@@ -86,6 +86,10 @@ class CostumInputAccessoryView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: UITextView.textDidChangeNotification, object: nil)
+    }
+    
     override var intrinsicContentSize: CGSize {
         return .zero
     }

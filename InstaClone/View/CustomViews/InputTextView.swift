@@ -39,6 +39,10 @@ class InputTextView: UITextView {
         
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: UITextView.textDidChangeNotification, object: nil)
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

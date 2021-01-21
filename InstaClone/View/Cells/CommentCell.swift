@@ -8,7 +8,7 @@
 import UIKit
 
 protocol commentCellDelegate: class {
-    func cellWantsToDelete(comment: Comment)
+    func cellWantsToDelete(_ cell: CommentCell, comment: Comment)
 }
 
 class CommentCell: UICollectionViewCell {
@@ -104,6 +104,6 @@ class CommentCell: UICollectionViewCell {
     
     @objc func handleDetailsButtonTapped () {
         guard let viewModel = viewModel else {return}        
-        delegate?.cellWantsToDelete(comment: viewModel.comment)
+        delegate?.cellWantsToDelete(self, comment: viewModel.comment)
     }
 }

@@ -191,6 +191,12 @@ extension ProfileController: UICollectionViewDelegateFlowLayout {
 //MARK: - ProfileHeaderDelegate
 
 extension ProfileController: ProfileHeaderDelegate {
+    func header(_ profileHeader: ProfileHeader, wantsToShowUserFollowers show: Bool) {
+        let controller = FollowersController(user: user, showFollowers: show)
+        
+        navigationController?.pushViewController(controller, animated: true)
+    }
+    
     func header(_ profileHeader: ProfileHeader, didTapActionButtonFor user: User) {
         guard let tab = tabBarController as? MainTabController,
               let currentUser = tab.user else {return}
@@ -221,12 +227,6 @@ extension ProfileController: ProfileHeaderDelegate {
                 }
             }
         }
-    }
-    
-    func header(wantsToShowUserFollowers show: Bool) {
-        let controller = FollowersController(user: user, showFollowers: show)
-        
-        navigationController?.pushViewController(controller, animated: true)
     }
 }
 

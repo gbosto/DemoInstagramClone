@@ -194,7 +194,8 @@ extension CommentController: CostumInputAccessoryViewDelegate {
     }}
 
 extension CommentController: commentCellDelegate {
-    func cellWantsToDelete(comment: Comment) {
+   
+    func cellWantsToDelete(_ cell: CommentCell, comment: Comment) {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
         let deleteAction = UIAlertAction(title: "Delete comment", style: .default) { _ in

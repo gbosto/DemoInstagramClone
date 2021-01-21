@@ -186,7 +186,10 @@ extension LoginController: ResetPasswordControllerDelegate {
 extension LoginController: TogglePasswordButtonDelegate {
     func buttonPressed(button: TogglePasswordButton) {
         button.isSecured.toggle()
-        var buttonImage: UIImage {return button.isSecured ? UIImage(systemName: "eye.slash")! : UIImage(systemName: "eye")!}
+        guard let eyeSlashImage = UIImage(systemName: "eye.slash"),
+              let eyeImage = UIImage(systemName: "eye") else {return}
+        
+        var buttonImage: UIImage {return button.isSecured ? eyeSlashImage : eyeImage}
         var buttonTintColor: UIColor {return button.isSecured ? .lightGray : .black}
         
         toggleSecureTextButton.setImage(buttonImage, for: .normal)

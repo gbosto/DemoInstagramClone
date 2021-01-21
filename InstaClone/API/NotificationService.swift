@@ -7,6 +7,8 @@
 
 import Firebase
 
+
+
 struct NotificationService {
     static func uploadNotification(toUid uid: String,
                                    fromUser: User,
@@ -16,16 +18,16 @@ struct NotificationService {
         guard let currentUid = Auth.auth().currentUser?.uid else {return}
         guard uid != currentUid else {return}
         
-        let docRef = API.collectionNotifications.document(uid).collection("user-notifications").document()
+        let docRef = API.collectionNotifications.document(uid).collection(Resources.userNotifications).document()
         
-        var data: [String: Any] = ["timestamp" : Timestamp(date: Date()),
-                                   "uid" : fromUser.uid,
-                                   "type" : type.rawValue,
-                                   "id" : docRef.documentID]
+        var data: [String: Any] = [Resources.timestamp : Timestamp(date: Date()),
+                                   Resources.uid : fromUser.uid,
+                                   Resources.type : type.rawValue,
+                                   Resources.id : docRef.documentID]
         
         if let post = post {
-            data["postId"] = post.postId
-            data["postImageUrl"] = post.imageUrl
+            data[Resources.postId] = post.postId
+            data[Resources.postImageUrl] = post.imageUrl
         }
         
             docRef.setData(data)
@@ -34,7 +36,8 @@ struct NotificationService {
     static func fetchNotification(completion: @escaping([Notification]) -> Void) {
         guard let uid = Auth.auth().currentUser?.uid else {return}
                 
-        API.collectionNotifications.document(uid).collection("user-notifications").order(by: "timestamp", descending: true).getDocuments { snapshot, _ in
+        API.collectionNotifications.document(uid).collection(Resources.userNotifications).order(by: Resources.timestamp,
+                                                                                                descending: true).getDocuments { snapshot, _ in
             guard let documents = snapshot?.documents else {return}
             
             let notifications = documents.map { Notification(dictionary: $0.data())}

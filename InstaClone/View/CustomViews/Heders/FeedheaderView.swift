@@ -8,11 +8,11 @@
 import UIKit
 
 protocol FeedHeaderViewDelegate: class {
-    func headerDidTapBackButton()
-    func headerWantsToShowDirectMessages()
+    func headerWantsToGoBack(_ feedHeader: FeedHeader)
+    func headerWantsToShowDirectMessages(_ feedHeader: FeedHeader)
 }
 
-class FeedHeaderView: UICollectionReusableView {
+class FeedHeader: UICollectionReusableView {
     
     //MARK: - Properties
     
@@ -77,11 +77,11 @@ class FeedHeaderView: UICollectionReusableView {
     //MARK: - Selectors
     
     @objc func handleShowDirectMessages () {
-        delegate?.headerWantsToShowDirectMessages()
+        delegate?.headerWantsToShowDirectMessages(self)
     }
     
     @objc func handleBackButtonTapped () {
-        delegate?.headerDidTapBackButton()
+        delegate?.headerWantsToGoBack(self)
     }
 }
 

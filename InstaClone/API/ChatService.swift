@@ -7,23 +7,25 @@
 
 import Firebase
 
+
+
 struct ChatService {
 
     static func uploadMessage(_ message: String, to user: User, completion: ((Error?) -> Void)?) {
         guard let currentUid = Auth.auth().currentUser?.uid else {return}
         
-        let data = ["text" : message,
-                    "fromId" : currentUid,
-                    "toId" : user.uid,
-                    "timestamp" : Timestamp(date: Date())] as [String : Any]
+        let data = [Resources.text : message,
+                    Resources.fromId : currentUid,
+                    Resources.toId : user.uid,
+                    Resources.timestamp : Timestamp(date: Date())] as [String : Any]
         
         API.collectionMessages.document(currentUid).collection(user.uid).addDocument(data: data) { _ in
             API.collectionMessages.document(user.uid).collection(currentUid).addDocument(data: data, completion: completion)
         }
         
-        API.collectionMessages.document(currentUid).collection("recent-messages").document(user.uid).setData(data)
+        API.collectionMessages.document(currentUid).collection(Resources.recentMessages).document(user.uid).setData(data)
         
-        API.collectionMessages.document(user.uid).collection("recent-messages").document(currentUid).setData(data)
+        API.collectionMessages.document(user.uid).collection(Resources.recentMessages).document(currentUid).setData(data)
 
     }
     
@@ -32,7 +34,7 @@ struct ChatService {
         
         guard  let currentUid = Auth.auth().currentUser?.uid else {return}
         
-        let query = API.collectionMessages.document(currentUid).collection(user.uid).order(by: "timestamp")
+        let query = API.collectionMessages.document(currentUid).collection(user.uid).order(by: Resources.timestamp)
         
         query.addSnapshotListener { snapshot, error in
             snapshot?.documentChanges.forEach({ change in
@@ -49,7 +51,7 @@ struct ChatService {
         var conversations = [Conversation]()
         guard let uid = Auth.auth().currentUser?.uid else {return}
         
-        let query = API.collectionMessages.document(uid).collection("recent-messages").order(by: "timestamp")
+        let query = API.collectionMessages.document(uid).collection(Resources.recentMessages).order(by: Resources.timestamp)
         
         query.addSnapshotListener { snapshot, error in
             snapshot?.documentChanges.forEach({ change in

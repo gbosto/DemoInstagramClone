@@ -8,8 +8,8 @@
 import UIKit
 
 protocol EditProfileViewDelegate: class {
-    func viewWantsToEditName()
-    func viewWantsToEditUserName()
+    func viewWantsToEditName(_ view: EditProfileView)
+    func viewWantsToEditUserName(_ view: EditProfileView)
 }
 
 class EditProfileView: UIView {
@@ -116,10 +116,10 @@ class EditProfileView: UIView {
     //MARK: - Selectors
     
     @objc func handleEditName() {
-        delegate?.viewWantsToEditName()
+        delegate?.viewWantsToEditName(self)
     }
     
     @objc func handleEditUsername() {
-        delegate?.viewWantsToEditUserName()
+        delegate?.viewWantsToEditUserName(self)
     }
 }

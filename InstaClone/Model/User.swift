@@ -24,12 +24,12 @@ struct User {
     }
     
     init(dictionary: [String : Any]) {
-        self.email = dictionary["email"] as? String ?? " "
-        self.fullname = dictionary["fullname"] as? String ?? " "
-        self.profileImageUrl = dictionary["profileImageUrl"] as? String ?? " "
-        self.username = dictionary["username"] as? String ?? " "
-        self.uid = dictionary["uid"] as? String ?? " "
-        self.profileImageUid = dictionary["profileImageUid"] as? String ?? " "
+        self.email = dictionary[Resources.email] as? String ?? Resources.emptyString
+        self.fullname = dictionary[Resources.fullname] as? String ?? Resources.emptyString
+        self.profileImageUrl = dictionary[Resources.profileImageUrl ] as? String ?? Resources.emptyString
+        self.username = dictionary[Resources.username] as? String ?? Resources.emptyString
+        self.uid = dictionary[Resources.uid] as? String ?? Resources.emptyString
+        self.profileImageUid = dictionary[Resources.profileImageUid] as? String ?? Resources.emptyString
 
         self.stats = UserStats(followers: 0, following: 0, posts: 0)
     }

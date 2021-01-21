@@ -14,7 +14,6 @@ struct ImageService {
         
         guard let imageData = image.jpegData(compressionQuality: 0.75) else {return}
         
-        
         let reference = Storage.storage().reference(withPath: "\(directory)\(uuid)")
         
         reference.putData(imageData, metadata: nil) { metadata, error in

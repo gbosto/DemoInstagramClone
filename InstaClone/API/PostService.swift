@@ -18,12 +18,12 @@ struct PostService {
         let directoryName = FireStoreDirectory.posts
         
         ImageService.uploadImage(image: image, uuid: uuid, directory: directoryName) { imageUrl in
-            let data = ["caption" : caption,
-                        "timestamp" : Timestamp(date: Date()),
-                        "likes" : 0,
-                        "imageUrl" : imageUrl,
-                        "ownerUid" : uid,
-                        "imageUid" : uuid] as [String : Any]
+            let data = [Resources.caption : caption,
+                        Resources.timestamp : Timestamp(date: Date()),
+                        Resources.likes : 0,
+                        Resources.imageUrl : imageUrl,
+                        Resources.ownerUid : uid,
+                        Resources.imageUid : uuid] as [String : Any]
             
             let docRef = API.collectionPosts.addDocument(data: data, completion: completion)
             
@@ -42,7 +42,7 @@ struct PostService {
     }
     
     static func fetchPosts(completion: @escaping([Post]) -> Void) {
-        API.collectionPosts.order(by: "timestamp", descending: true).getDocuments { snapshot, error in
+        API.collectionPosts.order(by: Resources.timestamp, descending: true).getDocuments { snapshot, error in
             guard let documents = snapshot?.documents else {return}
             
             let posts = documents.map { Post(postId: $0.documentID, dictionary: $0.data())}
@@ -53,7 +53,7 @@ struct PostService {
     }
     
     static func fetchPosts(forUser uid: String, completion: @escaping([Post]) -> Void) {
-        let query = API.collectionPosts.whereField("ownerUid", isEqualTo: uid)
+        let query = API.collectionPosts.whereField(Resources.ownerUid, isEqualTo: uid)
         
         query.getDocuments { snapshot, error in
             guard let documents = snapshot?.documents else {return}
@@ -66,13 +66,15 @@ struct PostService {
         }
     }
     
+   
+    
     static func likePost(post: Post, completion: @escaping(FirestoreCompletion)) {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         
-        API.collectionPosts.document(post.postId).updateData(["likes": post.likes + 1])
+        API.collectionPosts.document(post.postId).updateData([Resources.likes : post.likes + 1])
         
-        API.collectionPosts.document(post.postId).collection("post-likes").document(uid).setData([:]) { _ in
-            API.collectionUsers.document(uid).collection("user-likes").document(post.postId).setData([:], completion: completion)
+        API.collectionPosts.document(post.postId).collection(Resources.postLikes).document(uid).setData([:]) { _ in
+            API.collectionUsers.document(uid).collection(Resources.userLikes).document(post.postId).setData([:], completion: completion)
         }
     }
     
@@ -80,17 +82,17 @@ struct PostService {
         guard let uid = Auth.auth().currentUser?.uid,
               post.likes > 0 else {return}
         
-        API.collectionPosts.document(post.postId).updateData(["likes": post.likes - 1])
+        API.collectionPosts.document(post.postId).updateData([Resources.likes : post.likes - 1])
         
-        API.collectionPosts.document(post.postId).collection("post-likes").document(uid).delete { _ in
-            API.collectionUsers.document(uid).collection("user-likes").document(post.postId).delete(completion: completion)
+        API.collectionPosts.document(post.postId).collection(Resources.postLikes).document(uid).delete { _ in
+            API.collectionUsers.document(uid).collection(Resources.userLikes).document(post.postId).delete(completion: completion)
         }
     }
     
     static func checkIfUserLiked(post: Post, completion: @escaping(Bool) -> Void) {
         guard let uid = Auth.auth().currentUser?.uid else {return}
 
-        API.collectionUsers.document(uid).collection("user-likes").document(post.postId).getDocument { snapshot, _ in
+        API.collectionUsers.document(uid).collection(Resources.userLikes).document(post.postId).getDocument { snapshot, _ in
             
             guard let isLiked = snapshot?.exists else {return}
             completion(isLiked)
@@ -99,7 +101,7 @@ struct PostService {
     
     static func updateUserFeedAfterFollowing(user: User, didFollow: Bool) {
         guard let uid = Auth.auth().currentUser?.uid else {return}
-        let query = API.collectionPosts.whereField("ownerUid", isEqualTo: user.uid)
+        let query = API.collectionPosts.whereField(Resources.ownerUid, isEqualTo: user.uid)
         
         query.getDocuments { snapshot, error in
             guard let documents = snapshot?.documents else {return}
@@ -109,9 +111,9 @@ struct PostService {
             docIds.forEach { id in
                 
             if didFollow {
-                API.collectionUsers.document(uid).collection("user-feed").document(id).setData([:])
+                API.collectionUsers.document(uid).collection(Resources.userFeed).document(id).setData([:])
             } else {
-                API.collectionUsers.document(uid).collection("user-feed").document(id).delete()
+                API.collectionUsers.document(uid).collection(Resources.userFeed).document(id).delete()
                 }
             }
         }
@@ -121,7 +123,7 @@ struct PostService {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         var posts = [Post]()
 
-        API.collectionUsers.document(uid).collection("user-feed").getDocuments { snapshot, error in
+        API.collectionUsers.document(uid).collection(Resources.userFeed).getDocuments { snapshot, error in
             snapshot?.documents.forEach({ document in
                 fetchPost(withPostId: document.documentID) { post in
                     posts.append(post)
@@ -135,14 +137,14 @@ struct PostService {
     private static func updateUserFeedAfterPost(postId: String) {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         
-        API.collectionFollowers.document(uid).collection("user-followers").getDocuments { snapshot, _ in
+        API.collectionFollowers.document(uid).collection(Resources.userFollowers).getDocuments { snapshot, _ in
             guard let documents = snapshot?.documents else {return}
             
             documents.forEach { document in
-                API.collectionUsers.document(document.documentID).collection("user-feed").document(postId).setData([:])
+                API.collectionUsers.document(document.documentID).collection(Resources.userFeed).document(postId).setData([:])
             }
             
-            API.collectionUsers.document(uid).collection("user-feed").document(postId).setData([:])
+            API.collectionUsers.document(uid).collection(Resources.userFeed).document(postId).setData([:])
         }
     }
     
@@ -165,7 +167,7 @@ struct PostService {
         let directoryName = FireStoreDirectory.posts
         
         API.collectionPosts.document(post.postId).delete()
-        API.collectionUsers.document(currentUseruid).collection("user-feed").document(post.postId).delete()
+        API.collectionUsers.document(currentUseruid).collection(Resources.userFeed).document(post.postId).delete()
         ImageService.deleteImage(withUid: post.imageUid, directory: directoryName) { error in
             if let error = error {
                 print("error while deleting image \(error.localizedDescription)")
@@ -174,7 +176,7 @@ struct PostService {
 
         UserService.fetchFollowers(forUid: currentUseruid) { followers in
             followers.forEach { follower in
-                API.collectionUsers.document(follower.uid).collection("user-feed").document(post.postId).delete()
+                API.collectionUsers.document(follower.uid).collection(Resources.userFeed).document(post.postId).delete()
             }
         }
     }

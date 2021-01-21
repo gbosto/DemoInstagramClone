@@ -29,7 +29,6 @@ class ConversationCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .darkGray
-        label.text = "2h"
         
         return label
     }()

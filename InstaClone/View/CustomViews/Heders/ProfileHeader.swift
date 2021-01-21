@@ -10,7 +10,7 @@ import SDWebImage
 
 protocol ProfileHeaderDelegate: class {
     func header(_ profileHeader: ProfileHeader, didTapActionButtonFor user: User)
-    func header(wantsToShowUserFollowers show: Bool)
+    func header(_ profileHeader: ProfileHeader, wantsToShowUserFollowers show: Bool)
 }
 
 class ProfileHeader: UICollectionReusableView {
@@ -23,8 +23,7 @@ class ProfileHeader: UICollectionReusableView {
             populate()
         }
     }
-    
-    
+   
     private let profileImageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
@@ -39,15 +38,7 @@ class ProfileHeader: UICollectionReusableView {
     private let nameLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.boldSystemFont(ofSize: 14)
-        
-        return view
-    }()
-    
-    private let bioLabel: UILabel = {
-        let view = UILabel()
-        view.font = UIFont.systemFont(ofSize: 12)
-        view.text = "bio"
-        view.numberOfLines = 0
+
         
         return view
     }()
@@ -97,7 +88,6 @@ class ProfileHeader: UICollectionReusableView {
         return view
     }()
 
-    
     //MARK: - Lifecycle
     
     override init(frame: CGRect) {
@@ -111,15 +101,11 @@ class ProfileHeader: UICollectionReusableView {
         
         addSubview(nameLabel)
         nameLabel.anchor(top: profileImageView.bottomAnchor, left: leftAnchor,
-                         paddingTop: 12, paddingLeft: 12)
-        
-        addSubview(bioLabel)
-        bioLabel.anchor(top: nameLabel.bottomAnchor, left: leftAnchor, right: rightAnchor,
-                        paddingTop: 6, paddingLeft: 12, paddingRight: 12)
+                         paddingTop: 18, paddingLeft: 12)
         
         addSubview(editProfileFollowButton)
-        editProfileFollowButton.anchor(top: bioLabel.bottomAnchor, left: leftAnchor, right: rightAnchor,
-                                 paddingTop: 16, paddingLeft: 24, paddingRight: 24)
+        editProfileFollowButton.anchor(top: nameLabel.bottomAnchor, left: leftAnchor, right: rightAnchor,
+                                 paddingTop: 30, paddingLeft: 24, paddingRight: 24)
         
         let divider = UIView()
         divider.backgroundColor = .lightGray
@@ -127,7 +113,6 @@ class ProfileHeader: UICollectionReusableView {
         addSubview(divider)
         divider.anchor(top: editProfileFollowButton.bottomAnchor, left: leftAnchor,right: rightAnchor,
                        paddingTop: 30, height: 0.5)
-        
         
         configureStack()
     }
@@ -138,7 +123,6 @@ class ProfileHeader: UICollectionReusableView {
     
     
     //MARK: - Helper Methods
-
     
     func configureStack() {
         let stack = UIStackView(arrangedSubviews: [postLabel, followersLabel, followingLabel])
@@ -174,10 +158,10 @@ class ProfileHeader: UICollectionReusableView {
     }
     
     @objc func handleShowFollowers() {
-        delegate?.header(wantsToShowUserFollowers: true)
+        delegate?.header(self, wantsToShowUserFollowers: true)
     }
     
     @objc func handleShowFollowings() {
-        delegate?.header(wantsToShowUserFollowers: false)
+        delegate?.header(self, wantsToShowUserFollowers: false)
     }
 }

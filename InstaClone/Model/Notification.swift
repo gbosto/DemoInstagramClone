@@ -36,12 +36,12 @@ struct Notification {
     var userIsFollowed = false
     
     init(dictionary: [String: Any]) {
-        self.uid = dictionary["uid"] as? String ?? ""
-        self.id = dictionary["id"] as? String ?? ""
-        self.toUid = dictionary["toUid"] as? String ?? ""
-        self.postId = dictionary["postId"] as? String ?? ""
-        self.postImageUrl = dictionary["postImageUrl"] as? String ?? ""
-        self.type = NotificationType(rawValue: dictionary["type"] as? Int ?? 0) ?? .like
-        self.timestamp = dictionary["timestamp"] as? Timestamp ?? Timestamp(date: Date())
+        self.uid = dictionary[Resources.uid] as? String ?? Resources.emptyString
+        self.id = dictionary[Resources.id] as? String ?? Resources.emptyString
+        self.toUid = dictionary[Resources.toUid ] as? String ?? Resources.emptyString
+        self.postId = dictionary[Resources.postId] as? String ?? Resources.emptyString
+        self.postImageUrl = dictionary[Resources.postImageUrl] as? String ?? Resources.emptyString
+        self.type = NotificationType(rawValue: dictionary[Resources.type] as? Int ?? 0) ?? .like
+        self.timestamp = dictionary[Resources.timestamp] as? Timestamp ?? Timestamp(date: Date())
     }
 }

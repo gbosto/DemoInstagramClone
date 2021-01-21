@@ -17,9 +17,9 @@ struct Comment {
     var postBelongsToCurrentUser = false
     
     init(dictionary: [String:Any]) {
-        self.uid = dictionary["uid"] as? String ?? ""
-        self.comment = dictionary["comment"] as? String ?? ""
-        self.commentId = dictionary["commentId"] as? String ?? ""
-        self.timestamp = dictionary["timestamp"] as? Timestamp ?? Timestamp(date: Date())
+        self.uid = dictionary[Resources.uid] as? String ?? Resources.emptyString
+        self.comment = dictionary[Resources.comment] as? String ?? Resources.emptyString
+        self.commentId = dictionary[Resources.commentId] as? String ?? Resources.emptyString
+        self.timestamp = dictionary[Resources.timestamp] as? Timestamp ?? Timestamp(date: Date())
     }
 }

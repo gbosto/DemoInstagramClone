@@ -52,7 +52,7 @@ import Firebase
 
         collectionView.backgroundColor = .white
         collectionView.register(FeedCell.self, forCellWithReuseIdentifier: cellId)
-        collectionView.register(FeedHeaderView.self,
+        collectionView.register(FeedHeader.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: headerId)
      
@@ -67,9 +67,7 @@ import Firebase
             layout.sectionHeadersPinToVisibleBounds = true
         }
     }
-    
-   
-    
+
     //MARK: - API
     
     func fetchPosts() {
@@ -161,14 +159,13 @@ extension FeedController {
                                  at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
                                                                      withReuseIdentifier: headerId,
-                                                                     for: indexPath) as! FeedHeaderView
+                                                                     for: indexPath) as! FeedHeader
         header.delegate = self
         if post != nil {
             header.backButton.isHidden = false
             header.iconImageView.isHidden = true
             header.directMessagesButton.isHidden = true
         }
-        
         return header
     }
 }
@@ -255,7 +252,7 @@ extension FeedController: FeedCellDelegate {
         }
     }
     
-    func cellWantsToShowPostDetails(post: Post) {
+    func cell(_ cell: FeedCell, wantsToShowDetailsFor post: Post) {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
         let deleteAction = UIAlertAction(title: "Delete post", style: .default) { _ in
@@ -268,16 +265,16 @@ extension FeedController: FeedCellDelegate {
         alert.addAction(cancelAction)
         alert.addAction(deleteAction)
         present(alert, animated: true)
+        }
     }
-}
 
 extension FeedController: FeedHeaderViewDelegate {
-    func headerDidTapBackButton() {
+    func headerWantsToGoBack(_ feedHeader: FeedHeader) {
         navigationController?.popViewController(animated: true)
     }
     
-    func headerWantsToShowDirectMessages() {
-    let controller = ConversationsController()
-        navigationController?.pushViewController(controller, animated: true)
+    func headerWantsToShowDirectMessages(_ feedHeader: FeedHeader) {
+        let controller = ConversationsController()
+            navigationController?.pushViewController(controller, animated: true)
     }
 }
