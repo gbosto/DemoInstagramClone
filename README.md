@@ -16,10 +16,15 @@ The application has almost all core components of social media:
 
 
 
+
+
 screenshots: 
 
-![139627897_711533442890268_1143142575353411330_n](https://user-
+
+
+(https://user-
 ![140242056_199711605197359_5292497294464095295_n](https://user-images.githubusercontent.com/61325476/105507816-184e8f80-5ce5-11eb-8ddb-752d150404a2.jpg)
+
 ![140567632_2626089751024548_2649930142130784071_n](https://user-images.githubusercontent.com/61325476/105507818-18e72600-5ce5-11eb-906e-c56fdcb126ca.jpg)
 ![140654098_464430927930382_2908617868700717206_n](https://user-images.githubusercontent.com/61325476/105507819-197fbc80-5ce5-11eb-9a0c-f7bacb90a4b4.jpg)
 ![140976414_183994190188487_5530714270965047042_n](https://user-images.githubusercontent.com/61325476/105507823-197fbc80-5ce5-11eb-8520-b5c7f751a24b.jpg)
