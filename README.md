@@ -1,4 +1,4 @@
-# DemoInstagramClone
+# Instagram Clone
 
 IOS instagram clone. Built with swift and firebase for demonstration purpose. 
 
