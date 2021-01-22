@@ -1,6 +1,6 @@
 # Instagram Clone
 
-IOS instagram clone. Built with swift and firebase for demonstration purpose. 
+IOS instagram clone. Built with Swift and Firebase.
 
 The project is built with MVC architecture. The UI is created programmatically.
 The application has almost all core components of social media:
@@ -11,7 +11,8 @@ The application has almost all core components of social media:
 - Following liking and commenting capabilities
 - Uploading and deleting a post
 - User feed with personalized posts from followings
-- Search for User - Notifications
+- Search for User 
+- Notifications
 - Direct messages
 
 
