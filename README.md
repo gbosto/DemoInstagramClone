@@ -28,11 +28,11 @@ Feed            |  User Profile
 ![](https://user-images.githubusercontent.com/61325476/105509603-18e82580-5ce7-11eb-88b2-d4a42f8b962e.jpg)  |  ![](https://user-images.githubusercontent.com/61325476/105509765-4b921e00-5ce7-11eb-94b7-a91ef2376e25.jpg)
 
 
-Feed            |  User Profile                                 Feed            |  User Profile
-:-------------------------:|:-------------------------:    :-------------------------:|:-------------------------:             
+Notifications            |  chat                              
+:-------------------------:|:-------------------------:            
          
                                                          
-![](https://user-images.githubusercontent.com/61325476/105509603-18e82580-5ce7-11eb-88b2-d4a42f8b962e.jpg)  |  ![](https://user-images.githubusercontent.com/61325476/105509603-18e82580-5ce7-11eb-88b2-d4a42f8b962e.jpg)                                               ![](https://user-images.githubusercontent.com/61325476/105509603-18e82580-5ce7-11eb-88b2-d4a42f8b962e.jpg)  |  ![](https://user-images.githubusercontent.com/61325476/105509603-18e82580-5ce7-11eb-88b2-d4a42f8b962e.jpg)
+![](https://user-images.githubusercontent.com/61325476/105510191-cb1fed00-5ce7-11eb-89b6-cdab884a1ebf.jpg)  |  ![](https://user-images.githubusercontent.com/61325476/105510201-cf4c0a80-5ce7-11eb-8cfe-a40283eee29f.jpg)                                               
 
                                                        
 
