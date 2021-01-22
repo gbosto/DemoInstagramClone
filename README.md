@@ -21,4 +21,5 @@ The application has almost all core components of social media:
 screenshots: 
 
 
-<img src="https://user-images.githubusercontent.com/61325476/105508335-b3e00000-5ce5-11eb-82a7-f7ec10325d29.jpg" alt="Login Page" width="300" height="700">
+<img src="https://user-images.githubusercontent.com/61325476/105508335-b3e00000-5ce5-11eb-82a7-f7ec10325d29.jpg" alt="Login Page" width="300" height="600">
+<img src="https://user-images.githubusercontent.com/61325476/105508635-08837b00-5ce6-11eb-9f6e-eaa39a7954e8.jpg" alt="Registration Page" width="300" height="600">
